@@ -1,33 +1,92 @@
-.App {
-  text-align: center;
+.icons__footer {
+  padding: 8px;
+}
+.icons__footer:hover {
+  background-color:#5e5ef4 ;
+}
+.icons__footer:hover > i{
+  color: #fff;
+}
+.temporal__view-show{
+  width:90%;
+  height:150px;
+}
+.temporal__view-close{
+  width:0%;
+  height:0px;
 }
 
-.App-logo {
-  animation: App-logo-spin infinite 20s linear;
-  height: 40vmin;
-  pointer-events: none;
+.temporal__view{
+  position:absolute;
+  background-color:#fff;
+  bottom:10px;
+  left:10px;  
+  z-index: 100;
+  border: 1px solid #5e5ef4;
+  border-radius:10px;  
+  box-shadow: 1px 1px 10px #b9b9b9;
+  transition: .3s;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+.button__temp-view{
+  background-color: #5e5ef4;
+  position: absolute;  
+  z-index: 1000;
+  top: -40px;  
+  right: -40px;  
+  color: #fff;
+  font-weight: 500;
+  padding: 15px;
+  border-radius: 50%;
 }
 
-.App-link {
-  color: #61dafb;
-}
+.histogram__view{
+  z-index: 100;
+  position:absolute;
+  background-color:#fff;
+  top:40px;
+  right:40px;
+  border:1px solid #5e5ef4;
+  border-radius:10px;
+  box-shadow:1px 1px 10px #b9b9b9;
+  transition: .3s;
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+}
+.histogram__view-show{
+  width:35%;
+  height:450px;
+}
+.histogram__view-close{
+  width:0%;
+  height:0px;
+}
+.button__histogram-view{
+  background-color: #5e5ef4;
+  position: absolute;  
+  top: -40px;  
+  z-index: 1000;
+  right: -40px;  
+  color: #fff;
+  
+  font-weight: 500;
+  padding: 15px;
+  border-radius: 50%;
+}
+.color__marked{
+  color: #5e5ef4;
+}
+.color__marked-selected{
+  background-color: #5e5ef4;
+}
+.color__marked__icon-selected{
+  color: #fff;
+}
+.chartShow{
+/*background-color: red;*/
+}
+.linechart{
+  transition: .3s;
+}
+.chartHide{
+  display: none;
 }

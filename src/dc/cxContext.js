@@ -1,55 +1,43 @@
 import React from "react";
 import * as crossfilter from "crossfilter2";
-import {csv,timeFormat,timeParse,timeMonth,format} from 'd3'
+import {csv,timeFormat,timeParse,format} from 'd3'
 import "dc/dc.css";
+import datasss from './../data/crimes.csv';
 
 export const CXContext = React.createContext("CXContext");
 export const  dateFormatSpecifier = '%m/%d/%Y';
+
 export const dateFormat = timeFormat(dateFormatSpecifier);
 export const dateFormatParser = timeParse(dateFormatSpecifier);
 export const numberFormat = format('.2f');
 
-export class DataContext extends React.Component {
+export class DataContext extends React.Component {  
   constructor(props) {
     super(props);
-    this.state={loading:false,hasNDX:false};
+    this.state={hasNDX:false};
+    console.log("aoaoaoaoaoao")
   }
-
   componentDidMount(){
+    console.log("repayaso")
       if (this.state.hasNDX){
           return
       }
-      if(this.state.loading){
-          return
-      }
-      this.setState({loading:true})
-      csv('./ndx.csv')
-        .then((data)=> {
-            data.forEach(function (d) {
-                d.dd = dateFormatParser(d.date);
-                d.month = timeMonth(d.dd); // pre-calculate month for better performance
-                d.close = +d.close; // coerce to number
-                d.open = +d.open;
-            });
-
-            this.ndx = crossfilter(data); //TODO possibly need to update this
-            this.setState({loading:false,hasNDX:true})
-            
-
-
-        })
-        
-
+      
+      this.ndx = crossfilter(this.props.dataset); //TODO possibly need to update this
+      this.setState({hasNDX:true})            
   }
-
+  componentWillUnmount() {
+    console.log("Bye");
+  }
   render() {
+    console.log("render")
       if(!this.state.hasNDX){
           return null;
       }
     return (
       <CXContext.Provider value={{ndx:this.ndx}}>
-        <div ref={this.parent}>
-        {this.props.children}
+        <div ref={this.parent}>           
+            {this.props.children}
         </div>
       </CXContext.Provider>
     );

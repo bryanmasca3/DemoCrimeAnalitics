@@ -4,17 +4,25 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@reduxjs/toolkit": "^1.6.1",
+    "axios": "^0.21.1",
     "crossfilter2": "^1.4.6",
     "d3": "^5.9.1",
     "dc": "^2.2.2",
-    "glamor": "^2.20.40",
+    "deck.gl": "^8.5.8",
+    "glamor": "^2.17.9",
+    "mapbox-gl": "^1.13.1",
+    "maplibre-gl": "^1.15.2",
     "react": "^16.8.2",
     "react-dom": "^16.8.2",
     "react-flexbox-grid": "^2.1.2",
-    "react-scripts": "2.1.5",
+    "react-map-gl": "^6.1.17",
+    "react-redux": "^7.2.4",
+    "react-scripts": "^4.0.3",
     "react-typography": "^0.16.18",
     "typography": "^0.16.18",
-    "typography-theme-funston": "^0.16.18"
+    "typography-theme-funston": "^0.16.18",
+    "web-vitals": "^1.1.2"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -23,17 +31,25 @@
     "eject": "react-scripts eject",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build"
-  
   },
   "eslintConfig": {
-    "extends": "react-app"
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
   },
-  "browserslist": [
-    ">0.2%",
-    "not dead",
-    "not ie <= 11",
-    "not op_mini all"
-  ],
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
   "devDependencies": {
     "gh-pages": "^2.0.1"
   }

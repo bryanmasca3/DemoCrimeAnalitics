@@ -1,57 +1,17 @@
-import React from 'react'
-import {Grid,Row,Col} from 'react-flexbox-grid'
-import { BubbleChart } from "./bubbleChart";
-import { GainOrLossChart } from "./gainOrLessChart";
-import { QuarterChart } from "./quarterChart";
-import { DayOfWeekChart } from "./dayOfWeekChart";
-import { FluctuationChart } from "./fluctuationChart";
-import { MoveChart } from "./moveChart";
-import { DataTable } from "./nasdaqTable";
-import { DataContext } from "./cxContext";
-import { css } from 'glamor';
-
-export const Dashboard = (props)=>{
-
-    const style = css({
-        padding:'1rem',
-        marginTop:'2rem'
-    })
-    return(
-        <div {...style}>
-        <DataContext>
-                <Row>
-                    <Col md={12} >
-                        <BubbleChart />
-                    </Col>
-                </Row>
-                <Row>
-                    <Col md={7}>
-                        <Row>
-                            <Col md={12}>
-                                <MoveChart />
-                            </Col>
-                        </Row>
-                        <Row>
-                            <Col md={6}>
-                                <GainOrLossChart />
-                            </Col>
-                            <Col md={6}>
-                                <FluctuationChart />
-                            </Col>
-
-                            <Col md={6}>
-                                <QuarterChart />
-                            </Col>
-                            <Col md={6}>
-                                <DayOfWeekChart />
-                            </Col>
-                        </Row>
-                    </Col>
-                    <Col md={5} style={{overflowY:'scroll', maxHeight:'70vh', width:'100%'}}>
-                        <DataTable />
-                    </Col>
-                </Row>
-        </DataContext>
-        </div>
-    )
+import React,{useState} from 'react'
+import {DataContext}  from "./cxContext";
+import { TemporalView} from "./temporalView";
+import { ChartView} from "./barchartView";
+import './../App.css';
+import {useSelector,useDispatch} from 'react-redux';
+import {selectSelector,setSelectorMarked} from "./../redux/slice/Data";
+ const Dashboard = ({data,state})=>{     
+    return (
+      <div>
+           <div style={{zIndex:1000,cursor:"pointer",position:"absolute",backgroundColor:"#fff",bottom:10,right:10,border:"1px solid #5e5ef4",borderRadius:"10px",boxShadow:"1px 1px 10px #b9b9b9"}}>                    
+          </div>
+          {state&&<DataContext dataset={data}> <TemporalView/><ChartView/></DataContext>}
+      </div>
+    );
 }
+export default Dashboard;

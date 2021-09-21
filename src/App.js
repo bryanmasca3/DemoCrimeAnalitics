@@ -1,28 +1,14 @@
-import React, { Component } from "react";
-import logo from "./logo.svg";
-import {typography} from './utils/typography'
-import { Dashboard } from "./dc/dashboard";
-import { Welcome } from "./welcome";
-import { Grid } from "react-flexbox-grid";
-import { css } from "glamor";
+import React from "react";
+import  AppLayer  from "./layers/app";
+import { store } from './redux/store';
+import { Provider } from 'react-redux';
 
-class App extends Component {
-
-  render() {
-    const style = css({
-      background: `#ddd`
-  
-    })
-    typography.injectStyles()
+const  App =()=>{
     return (
-      <div {...style}>
-      <Grid>
-      <Welcome />
-        <Dashboard />
-        </Grid>
-      </div>
+      <Provider store={store}>          
+         < AppLayer/> 
+      </Provider>
     );
-  }
 }
 
 export default App;
