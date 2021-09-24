@@ -10,8 +10,13 @@ import {ColumnLayer,LineLayer} from '@deck.gl/layers';
 import Dashboard from "./../dc/dashboard";
 import axios from 'axios';
 import {useSelector,useDispatch} from 'react-redux';
-import {selectSelector,setSelectorMarked} from "./../redux/slice/Data";
-const AppLayer=()=> {         
+import {selectDataFiltered,setDataFilterd} from "./../redux/slice/Data";
+const AppLayer=()=> {     
+  const DataSetFiltered = useSelector(selectDataFiltered);
+  const dispatch = useDispatch();
+
+  const [selectorMarked, setselectorMarked] = useState(0);
+
   const [viewState, setViewState] = useState({
     longitude: /*-87.68393218513461*/ -46.66708952168912,
     latitude: /*41.83339250270142*/-23.558393625659015,
@@ -19,20 +24,20 @@ const AppLayer=()=> {
     bearing: 0
   });
 
-  const [dataTest, setdataTest] = useState([]);
+  //const [dataTest, setdataTest] = useState([]);
   const [dataEdge, setdataEdge] = useState([]);
 
   const layers = [
     new ColumnLayer({
       id: 'column-layer',
-      data: dataTest,
+      data: DataSetFiltered,
       diskResolution: 10,
       radius: 15,
       extruded: true,
       pickable: true,
       elevationScale: 0,
       getPosition: d => d.location.coordinates,
-      getFillColor: d => [255, (1-(d.value/51)) * 255, 0, 255],
+      getFillColor: d => [0, 0, 0, 255],
       getLineColor: [0, 0, 0],
       getElevation: d => 1
     }),
@@ -47,14 +52,17 @@ const AppLayer=()=> {
     })   
   ];
   const handleClick = async({ coordinate }) => {        
-              const coordinateXY={
+       /*       const coordinateXY={
                 lng:-46.66708952168912,
                 lat:-23.558393625659015,
                 radius:3     
             };       
-            const res = await axios.post('http://localhost:4000/api/data/circle/', coordinateXY);            
-            setdataTest(res.data.Node);    
-            setdataEdge(res.data.Edge);      
+            const res = await axios.post('http://localhost:4000/api/data/circle/', coordinateXY);        
+            dispatch(setDataFilterd(res.data.Node));    
+            //setdataTest(res.data.Node);    
+            setdataEdge(res.data.Edge);     */
+            
+            
   };
   return ( <div>
       <DeckGL
@@ -67,6 +75,6 @@ const AppLayer=()=> {
           <StaticMap  mapStyle={MAP_STYLE} mapboxApiAccessToken={MAPBOX_TOKEN} />
           <NavigationControl style={NAV_CONTROL_STYLE} capturePointerMove={true}/>                                     
       </DeckGL>
-      <Dashboard data={dataTest} state={dataTest.length}/> </div>)
+      <Dashboard data={DataSetFiltered} state={DataSetFiltered.length}/> </div>)
 }
 export default AppLayer;

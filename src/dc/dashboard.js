@@ -3,14 +3,14 @@ import {DataContext}  from "./cxContext";
 import { TemporalView} from "./temporalView";
 import { ChartView} from "./barchartView";
 import './../App.css';
-import {useSelector,useDispatch} from 'react-redux';
-import {selectSelector,setSelectorMarked} from "./../redux/slice/Data";
- const Dashboard = ({data,state})=>{     
+
+ const Dashboard = ({data,state})=>{    
+
     return (
       <div>
            <div style={{zIndex:1000,cursor:"pointer",position:"absolute",backgroundColor:"#fff",bottom:10,right:10,border:"1px solid #5e5ef4",borderRadius:"10px",boxShadow:"1px 1px 10px #b9b9b9"}}>                    
           </div>
-          {state&&<DataContext dataset={data}> <TemporalView/><ChartView/></DataContext>}
+          {state&&<DataContext dataset={data}> <TemporalView/></DataContext>}
       </div>
     );
 }

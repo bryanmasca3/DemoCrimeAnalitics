@@ -1,22 +1,22 @@
 import { createSlice } from '@reduxjs/toolkit'
 
 const initialState = {
-  selectorMarked:0,
+  dataFiltered:0,
 }
 
-export const byselectorSlice = createSlice({
+export const byDataFilteredSlice = createSlice({
   name: 'selector',
   initialState,
   reducers: {
-    setSelectorMarked: (state, action) => {
-      state.selectorMarked = action.payload
+    setDataFilterd: (state, action) => {
+      state.dataFiltered = action.payload
     }
 
   },
 })
 
-export const {setSelectorMarked} = byselectorSlice.actions;
+export const {setDataFilterd} = byDataFilteredSlice.actions;
 
-export const selectSelector = (state)=>state.selectorSlice.selectorMarked;
+export const selectDataFiltered = (state)=>state.dataFilteredSlice.dataFiltered;
 
-export default byselectorSlice.reducer
+export default byDataFilteredSlice.reducer

@@ -3,9 +3,11 @@ import * as dc from "dc";
 import { scaleLinear,scaleTime, timeMonth,timeParse ,max} from "d3";
 import { ChartTemplate } from "./chartTemplate";
 import './../App.css';
+import {selectDataFiltered,setDataFilterd} from "./../redux/slice/Data";
+const MoveChartFunc = (divRef, ndx,dispatch) => {
+  //const DataSetFiltered = useSelector(selectDataFiltered);
+  
 
-const moveChartFunc = (divRef, ndx) => {
- 
   const dateFmt = timeParse("%d-%m-%Y %H:%M:%S");
  
   const moveChart = dc.lineChart(divRef);  
@@ -31,8 +33,9 @@ const moveChartFunc = (divRef, ndx) => {
     .renderArea(true)
     .colors(["#f46d43"])    
     .on("filtered", function() {
-        console.log("payasp")
-        console.log(dimTime.top(Infinity))
+        //console.log("payasp")
+        dispatch(setDataFilterd(dimTime.top(Infinity)));    
+        //console.log(dimTime.top(Infinity))
   })     
     .clipPadding(10)     
     .dimension(dimTime)      
@@ -53,7 +56,7 @@ const moveChartFunc = (divRef, ndx) => {
 
 export const TemporalView = ()  => (
     <div className="temporal__view">
-        <ChartTemplate chartFunction={moveChartFunc} title="Monthly Price Moves"/>
+        <ChartTemplate chartFunction={MoveChartFunc} title="Monthly Price Moves"/>
     </div>
     
 )

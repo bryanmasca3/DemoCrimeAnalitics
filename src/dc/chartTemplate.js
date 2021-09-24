@@ -1,6 +1,7 @@
 import React from "react";
 import { CXContext } from "./cxContext";
 import * as dc from "dc";
+import {useSelector,useDispatch} from 'react-redux';
 
 const ResetButton = props => {
 
@@ -16,6 +17,7 @@ const ResetButton = props => {
   );
 };
 export const ChartTemplate = props => {
+  const dispatch = useDispatch();
   const context = React.useContext(CXContext);
   const [chart,updateChart] = React.useState(null);
   const ndx = context.ndx;
@@ -23,7 +25,7 @@ export const ChartTemplate = props => {
   
   React.useEffect(() => {
    // console.log('ohhhhhhhhhhhhhhhhhhhhhhhhhhhhhh')
-    const newChart = props.chartFunction(div.current, ndx); 
+    const newChart = props.chartFunction(div.current, ndx,dispatch); 
     newChart.render();
     updateChart(newChart);
   },[]);
