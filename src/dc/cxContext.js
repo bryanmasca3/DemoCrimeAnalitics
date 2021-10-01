@@ -11,7 +11,9 @@ export const dateFormat = timeFormat(dateFormatSpecifier);
 export const dateFormatParser = timeParse(dateFormatSpecifier);
 export const numberFormat = format('.2f');
 
+
 export class DataContext extends React.Component {  
+  
   constructor(props) {
     super(props);
     this.state={hasNDX:false};

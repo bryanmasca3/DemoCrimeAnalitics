@@ -2,6 +2,7 @@ import React from "react";
 import { CXContext } from "./cxContext";
 import * as dc from "dc";
 import {useSelector,useDispatch} from 'react-redux';
+import {selectDataFiltered,setDataFilterd} from "./../redux/slice/Data";
 
 const ResetButton = props => {
 

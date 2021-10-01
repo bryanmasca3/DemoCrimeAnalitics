@@ -1,6 +1,6 @@
 import React from "react";
 import * as dc from "dc";
-import { scaleLinear,scaleTime, timeMonth,timeParse ,max} from "d3";
+import {extent, scaleLinear,scaleTime, timeMonth,timeParse ,max} from "d3";
 import { ChartTemplate } from "./chartTemplate";
 import './../App.css';
 import {selectDataFiltered,setDataFilterd} from "./../redux/slice/Data";
@@ -22,6 +22,9 @@ const MoveChartFunc = (divRef, ndx,dispatch) => {
   const yMin          = 0;
   const yMax          = max(times.all(), function(f) { return f.value })    
 
+  const dimNode          = ndx.dimension(function(f) { return f.codnode;});
+  const GroupNodes       = dimNode.group().reduceSum(function(d) {return +1;});
+
   moveChart
   
     .width(1400)
@@ -35,6 +38,13 @@ const MoveChartFunc = (divRef, ndx,dispatch) => {
     .on("filtered", function() {
         //console.log("payasp")
         dispatch(setDataFilterd(dimTime.top(Infinity)));    
+
+       /* const ExtendsData = extent(GroupNodes.all(), function(d) { return d.value; });
+        console.log(ExtendsData)
+        const ddd=GroupNodes.all().map((s) =>{            
+          return  array.find(item => item.osmid == s.key);
+      });    
+      console.log(ddd)*/
         //console.log(dimTime.top(Infinity))
   })     
     .clipPadding(10)     

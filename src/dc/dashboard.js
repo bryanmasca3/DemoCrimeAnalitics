@@ -10,7 +10,7 @@ import './../App.css';
       <div>
            <div style={{zIndex:1000,cursor:"pointer",position:"absolute",backgroundColor:"#fff",bottom:10,right:10,border:"1px solid #5e5ef4",borderRadius:"10px",boxShadow:"1px 1px 10px #b9b9b9"}}>                    
           </div>
-          {state&&<DataContext dataset={data}> <TemporalView/></DataContext>}
+          {state&&<DataContext dataset={data}> <TemporalView/><ChartView/></DataContext>}
       </div>
     );
 }

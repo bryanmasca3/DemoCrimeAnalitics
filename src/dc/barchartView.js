@@ -2,8 +2,8 @@ import React from "react";
 import * as dc from "dc";
 import { ChartTemplate } from "./chartTemplate";
 import './../App.css';
-
-const dayOfWeekFunc = (divRef, ndx) => {
+import {selectDataFiltered,setDataFilterd} from "./../redux/slice/Data";
+const dayOfWeekFunc = (divRef, ndx,dispatch) => {
     const dayOfWeekChart = dc.rowChart(divRef)
     //data.map(a=>a.atribute.map(item=>dataParse.push({"date":item.Fecha})))
     var dimCrimeType     = ndx.dimension((d) =>d.Type);
@@ -18,7 +18,12 @@ const dayOfWeekFunc = (divRef, ndx) => {
     .margins({top: 10, right: 40, bottom: 25, left: 10})
     .renderTitle(true)
     .title(function(d) { return d.key + "  " + d.value })
-    .colors(["#66c2a5"])
+    .colors(["#3e6be0"])
+    .on("filtered", function() {
+        //console.log("payasp")
+        dispatch(setDataFilterd(dimCrimeType.top(Infinity)));    
+        //console.log(dimTime.top(Infinity))
+  })     
     dayOfWeekChart.title(function(d){
         let keyvalue = d.key+" "+d.value;
         return keyvalue;
