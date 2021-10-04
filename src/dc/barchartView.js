@@ -1,4 +1,4 @@
-import React from "react";
+import React,{useState} from "react";
 import * as dc from "dc";
 import { ChartTemplate } from "./chartTemplate";
 import './../App.css';
@@ -32,14 +32,14 @@ const dayOfWeekFunc = (divRef, ndx,dispatch) => {
 }
 
 export const ChartView = () =>{
-    return(
-  
-        <div className="histogram__view">
+    const [isHistogramView, setisHistogramView]=useState(false);  
+    return(<>
+     <div className="button__histogram-view" onClick={()=>setisHistogramView(!isHistogramView)}><i class="uil uil-chart-bar"></i></div>
+        <div className={`histogram__view ${isHistogramView?"histogram__view-show":"histogram__view-close"}` }>
+           
             <ChartTemplate chartFunction={dayOfWeekFunc} title="Weekday" />    
-        </div>
-            
-      
-        
+        </div>  
+        </>                        
     )
 } 
 

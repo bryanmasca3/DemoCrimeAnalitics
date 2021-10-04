@@ -1,4 +1,4 @@
-import React from "react";
+import React,{useState} from "react";
 import * as dc from "dc";
 import {extent, scaleLinear,scaleTime, timeMonth,timeParse ,max} from "d3";
 import { ChartTemplate } from "./chartTemplate";
@@ -27,7 +27,7 @@ const MoveChartFunc = (divRef, ndx,dispatch) => {
 
   moveChart
   
-    .width(1400)
+    .width(1450)
     .height(150)
     .transitionDuration(1000)
     .renderHorizontalGridLines(true)
@@ -64,9 +64,17 @@ const MoveChartFunc = (divRef, ndx,dispatch) => {
     return moveChart;
 };
 
-export const TemporalView = ()  => (
-    <div className="temporal__view">
-        <ChartTemplate chartFunction={MoveChartFunc} title="Monthly Price Moves"/>
-    </div>
-    
-)
+export const TemporalView = ()  => {
+  const [isShowTempView, setisShowTempView]=useState(false); 
+  return(<>
+    <div className="button__temp-view" onClick={()=>setisShowTempView(!isShowTempView)}><i class="uil uil-chart-line"></i> </div>        
+    <div className={`temporal__view ${isShowTempView?"temporal__view-show":"temporal__view-close"}` }>
+      
+            <ChartTemplate chartFunction={MoveChartFunc} title="Monthly Price Moves"/>        
+      </div>
+      </>
+      
+  )
+}
+
+

@@ -7,13 +7,13 @@ import {selectDataFiltered,setDataFilterd} from "./../redux/slice/Data";
 const ResetButton = props => {
 
   return (
-    <span
+    <span style={{"cursor":"pointer","position":"absolute","bottom":"0","right":"0"}}
       onClick={() => {
         props.chart.filterAll();
         dc.redrawAll();
       }}
     >
-      reset
+      <i class="uil uil-minus-circle" style={{"fontSize":"1.2em"}}></i>
     </span>
   );
 };
@@ -35,7 +35,7 @@ export const ChartTemplate = props => {
     <div
       ref={div}      
     >    
-     <ResetButton chart={chart} />     
+      <div><ResetButton chart={chart} /></div>
     </div>
   );
 };

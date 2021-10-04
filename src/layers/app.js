@@ -16,6 +16,10 @@ import {selectDataFiltered,setDataFilterd} from "./../redux/slice/Data";
 const AppLayer=()=> {     
   const [selectionMarked, setselectionMarked] = useState(0);
 
+  const [selectionFilterPoint, setselectionFilterPoint] = useState(1);
+  const [selectionFilterLine, setselectionFilterLine] = useState(1);
+  const [selectionFilterPolygon, setselectionFilterPolygon] = useState(0);
+
   const DataSetFiltered = useSelector(selectDataFiltered);
   const dispatch = useDispatch();
   let stateCircle=0;
@@ -32,10 +36,11 @@ const AppLayer=()=> {
   const [dataEdge, setdataEdge] = useState([]);
   const [dataPolygon, setdataPolygon] = useState([]);
 
-const colors=[[255,255,255,255],[136,209,164,255],[171,221,164,255],[230,245,152,255],[255,255,191,255],[255,255,191,255],[254,224,139,255],[253,174,97,255],[244,109,67,255],[244,76,67,255],[246,56,56,255],[128,0,38,255]]
+const colors=[[255,255,255,255],[136,209,164,255],[171,221,164,255],[230,245,152,255],[255,255,191,255],[254,224,139,255],[253,174,97,255],[244,109,67,255],[244,76,67,255],[246,56,56,255],[128,0,38,255]]
+const colorsrgba=["#ffffff","#88d1a4","#abdda4","#e6f598","#ffffbf","#fee08b","#fdae61","#f46d43","#f44c43","#f63838","#800026"]
 
   const layers = [
-    new PolygonLayer({
+    selectionFilterPolygon?new PolygonLayer({
       id: 'polygon-layer',
       data:dataPolygon,
       pickable: true,
@@ -44,11 +49,11 @@ const colors=[[255,255,255,255],[136,209,164,255],[171,221,164,255],[230,245,152
       wireframe: true,
       lineWidthMinPixels: 1,
       getPolygon: d => d.location.coordinates,     
-      getFillColor: d => colors[Math.floor(Math.random() * (255 + 1) ),Math.floor(Math.random() * (255 + 1) ),Math.floor(Math.random() * (255 + 1) )],
+      getFillColor: d => colors[Math.floor(Math.random() * (10) )],
       getLineColor: [179, 255, 0],
       getLineWidth: 1
-    }),
-    new LineLayer({
+    }):null,
+    selectionFilterLine?new LineLayer({
       id: 'line-layer',
       data: dataEdge,
       pickable: true,
@@ -56,8 +61,8 @@ const colors=[[255,255,255,255],[136,209,164,255],[171,221,164,255],[230,245,152
       getSourcePosition: d => d.location.coordinates[0],
       getTargetPosition: d => d.location.coordinates[1],
       getColor: d =>  [207, 153, 81]//DEBIAR CAMBIAR EL COLOR
-    }),
-    new ColumnLayer({
+    }):null,
+    selectionFilterPoint?new ColumnLayer({
       id: 'column-layer',
       data: DataSetFiltered,
       diskResolution: 10,
@@ -68,7 +73,7 @@ const colors=[[255,255,255,255],[136,209,164,255],[171,221,164,255],[230,245,152
       getPosition: d => d.location.coordinates,
       getFillColor: d => colors[Math.floor(Math.random() * (11 + 1) )],//DEBIAR CAMBIAR EL COLOR      
       getElevation: d => 1
-    })
+    }):null
     
    /* new GeoJsonLayer({
       id: 'geojson-layer',
@@ -184,11 +189,27 @@ const colors=[[255,255,255,255],[136,209,164,255],[171,221,164,255],[230,245,152
                 <div onClick={()=>selectionMarked===4?setselectionMarked(0):setselectionMarked(4)} className={`icons__footer color__marked ${selectionMarked===4?"color__marked-selected":""}`}><i class={`uil uil-trash-alt ${selectionMarked===4?"color__marked__icon-selected":""}`}></i></div>       
             </div>       
         </div>  
+        <div style={{zIndex:1000,cursor:"pointer",position:"absolute",backgroundColor:"#fff",top:280,left:10,boxShadow:"1px 1px 10px #b9b9b9"}}>
+            <div style={{display:'flex',flexDirection:"column"}}>                
+                <div className="color-bars" style={{"background-color":colorsrgba[0]}}></div>                            
+                <div className="color-bars" style={{"background-color":colorsrgba[1]}}></div>                            
+                <div className="color-bars" style={{"background-color":colorsrgba[2]}}></div>     
+                <div className="color-bars" style={{"background-color":colorsrgba[3]}}></div>                            
+                <div className="color-bars" style={{"background-color":colorsrgba[4]}}></div>                            
+                <div className="color-bars" style={{"background-color":colorsrgba[5]}}></div>   
+                <div className="color-bars" style={{"background-color":colorsrgba[6]}}></div>                            
+                <div className="color-bars" style={{"background-color":colorsrgba[7]}}></div>                            
+                <div className="color-bars" style={{"background-color":colorsrgba[8]}}></div>   
+                <div className="color-bars" style={{"background-color":colorsrgba[9]}}></div>                            
+                <div className="color-bars" style={{"background-color":colorsrgba[10]}}></div>                                                                   
+            </div>       
+        </div> 
+
         <div style={{zIndex:1000,cursor:"pointer",position:"absolute",backgroundColor:"#fff",top:10,left:10,border:"1px solid #5e5ef4",borderRadius:"10px",boxShadow:"1px 1px 10px #b9b9b9"}}>
             <div style={{display:'flex',flexDirection:"column"}}>                
-                <div onClick={()=>selectionMarked===1?setselectionMarked(0):setselectionMarked(1)} className={`icons__footer color__marked ${selectionMarked===1?"color__marked-selected":""}`}><i class={`uil uil-square-full ${selectionMarked===1?"color__marked__icon-selected":""}`}></i></div>                            
-                <div onClick={()=>selectionMarked===1?setselectionMarked(0):setselectionMarked(1)} className={`icons__footer color__marked ${selectionMarked===1?"color__marked-selected":""}`}><i class={`uil uil uil-line-alt ${selectionMarked===1?"color__marked__icon-selected":""}`}></i></div>                            
-                <div onClick={()=>selectionMarked===1?setselectionMarked(0):setselectionMarked(1)} className={`icons__footer color__marked ${selectionMarked===1?"color__marked-selected":""}`}><i class={`uil uil-map-pin ${selectionMarked===1?"color__marked__icon-selected":""}`}></i></div>                            
+                <div onClick={()=>selectionFilterPoint?setselectionFilterPoint(0):setselectionFilterPoint(1)} className={`icons__footer color__marked ${selectionFilterPoint?"color__marked-selected":""}`}><i class={`uil uil-map-pin ${selectionFilterPoint?"color__marked__icon-selected":""}`}></i></div>                            
+                <div onClick={()=>selectionFilterLine?setselectionFilterLine(0):setselectionFilterLine(1)} className={`icons__footer color__marked ${selectionFilterLine?"color__marked-selected":""}`}><i class={`uil uil uil-line-alt ${selectionFilterLine?"color__marked__icon-selected":""}`}></i></div>                            
+                <div onClick={()=>selectionFilterPolygon?setselectionFilterPolygon(0):setselectionFilterPolygon(1)} className={`icons__footer color__marked ${selectionFilterPolygon?"color__marked-selected":""}`}><i class={`uil uil-square-full ${selectionFilterPolygon?"color__marked__icon-selected":""}`}></i></div>                            
             </div>       
         </div> 
         {polygonMarker.map((item)=>

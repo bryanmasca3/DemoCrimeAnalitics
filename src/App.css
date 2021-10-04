@@ -14,13 +14,13 @@
 .temporal__view-close{
   width:0%;
   height:0px;
+  display: none;
 }
-
 .temporal__view{
   position:absolute;
   background-color:#fff;
-  bottom:10px;
-  left:10px;  
+  bottom:30px;
+  left:30px;  
   z-index: 100;
   border: 1px solid #5e5ef4;
   border-radius:10px;  
@@ -32,11 +32,12 @@
   background-color: #5e5ef4;
   position: absolute;  
   z-index: 1000;
-  top: -40px;  
-  right: -40px;  
+  bottom: 10px;  
+  left: 10px;  
   color: #fff;
   font-weight: 500;
   padding: 15px;
+  cursor: pointer;
   border-radius: 50%;
 }
 
@@ -44,30 +45,31 @@
   z-index: 100;
   position:absolute;
   background-color:#fff;
-  top:40px;
-  right:40px;
+  top:30px;
+  right:30px;
   border:1px solid #5e5ef4;
   border-radius:10px;
   box-shadow:1px 1px 10px #b9b9b9;
-  transition: .3s;
+  transition: .3s ;
 
 }
 .histogram__view-show{
   width:35%;
-  height:450px;
+  height:450px;  
 }
 .histogram__view-close{
   width:0%;
+  display: none;  
   height:0px;
 }
 .button__histogram-view{
   background-color: #5e5ef4;
   position: absolute;  
-  top: -40px;  
+  top: 10px;  
   z-index: 1000;
-  right: -40px;  
+  right: 10px;  
   color: #fff;
-  
+  cursor: pointer;
   font-weight: 500;
   padding: 15px;
   border-radius: 50%;
@@ -89,4 +91,8 @@
 }
 .chartHide{
   display: none;
+}
+.color-bars{
+  width: 30px;
+  height: 15px;
 }
