@@ -4,10 +4,7 @@ import {extent, scaleLinear,scaleTime, timeMonth,timeParse ,max} from "d3";
 import { ChartTemplate } from "./chartTemplate";
 import './../App.css';
 import {selectDataFiltered,setDataFilterd} from "./../redux/slice/Data";
-const MoveChartFunc = (divRef, ndx,dispatch) => {
-  //const DataSetFiltered = useSelector(selectDataFiltered);
-  
-
+const MoveChartFunc = (divRef, ndx,dispatch) => {  
   const dateFmt = timeParse("%d-%m-%Y %H:%M:%S");
  
   const moveChart = dc.lineChart(divRef);  
@@ -20,13 +17,23 @@ const MoveChartFunc = (divRef, ndx,dispatch) => {
   const maxDate         = dimTime.top(1)[0]["Fecha"];
    
   const yMin          = 0;
-  const yMax          = max(times.all(), function(f) { return f.value })    
+  const yMax          = max(times.all(), (f)=> f.value )    
 
-  const dimNode          = ndx.dimension(function(f) { return f.codnode;});
-  const GroupNodes       = dimNode.group().reduceSum(function(d) {return +1;});
+  const dimNode          = ndx.dimension((f) => f.codnode);
+  const GroupNodes       = dimNode.group().reduceSum((d) => +1);
 
-  moveChart
-  
+ /* const datanew=ndx.all().map((item)=>{
+     const d=GroupNodes.all().find((it)=>item.codnode==it.key)               
+     return {
+       ...item,
+       value: d.value
+     }
+  })
+ 
+  dispatch(setDataFilterd(datanew));  */
+
+
+  moveChart  
     .width(1450)
     .height(150)
     .transitionDuration(1000)
@@ -36,16 +43,18 @@ const MoveChartFunc = (divRef, ndx,dispatch) => {
     .renderArea(true)
     .colors(["#f46d43"])    
     .on("filtered", function() {
-        //console.log("payasp")
-        dispatch(setDataFilterd(dimTime.top(Infinity)));    
-
-       /* const ExtendsData = extent(GroupNodes.all(), function(d) { return d.value; });
-        console.log(ExtendsData)
-        const ddd=GroupNodes.all().map((s) =>{            
-          return  array.find(item => item.osmid == s.key);
+      
+      dispatch(setDataFilterd(dimTime.top(Infinity)));    
+               
+      /*  const newdatafilter=dimTime.top(Infinity).map((item) =>{            
+          const d=GroupNodes.all().find((it)=>item.codnode==it.key)               
+          return {
+            ...item,
+            value: d.value
+          }
       });    
-      console.log(ddd)*/
-        //console.log(dimTime.top(Infinity))
+      dispatch(setDataFilterd(newdatafilter)); */
+      
   })     
     .clipPadding(10)     
     .dimension(dimTime)      
@@ -68,8 +77,7 @@ export const TemporalView = ()  => {
   const [isShowTempView, setisShowTempView]=useState(false); 
   return(<>
     <div className="button__temp-view" onClick={()=>setisShowTempView(!isShowTempView)}><i class="uil uil-chart-line"></i> </div>        
-    <div className={`temporal__view ${isShowTempView?"temporal__view-show":"temporal__view-close"}` }>
-      
+    <div className={`temporal__view ${isShowTempView?"temporal__view-show":"temporal__view-close"}` }>      
             <ChartTemplate chartFunction={MoveChartFunc} title="Monthly Price Moves"/>        
       </div>
       </>

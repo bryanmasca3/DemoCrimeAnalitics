@@ -13,6 +13,11 @@ import axios from 'axios';
 import {useSelector,useDispatch} from 'react-redux';
 import {selectDataFiltered,setDataFilterd} from "./../redux/slice/Data";
 
+
+
+const submenu=()=>{
+
+}
 const AppLayer=()=> {     
   const [selectionMarked, setselectionMarked] = useState(0);
 
@@ -36,22 +41,22 @@ const AppLayer=()=> {
   const [dataEdge, setdataEdge] = useState([]);
   const [dataPolygon, setdataPolygon] = useState([]);
 
-const colors=[[255,255,255,255],[136,209,164,255],[171,221,164,255],[230,245,152,255],[255,255,191,255],[254,224,139,255],[253,174,97,255],[244,109,67,255],[244,76,67,255],[246,56,56,255],[128,0,38,255]]
-const colorsrgba=["#ffffff","#88d1a4","#abdda4","#e6f598","#ffffbf","#fee08b","#fdae61","#f46d43","#f44c43","#f63838","#800026"]
+const colors=[[255,255,255,255],[251,255,210,255],[254,244,186,255],[255,238,164,255],[255,224,138,255],[252,218,123,255],[253,200,86,255],[251,120,74,255],[255,93,60,255],[255,63,63,255],[252,44,44,255]]
+const colorsrgba=["#fff","#fbffd2","#fef4ba","#ffeea4","#ffe08a","#fcda7b","#fdc856","#fb784a","#ff5d3c","#ff3f3f","#fc2c2c"]
 
   const layers = [
     selectionFilterPolygon?new PolygonLayer({
       id: 'polygon-layer',
       data:dataPolygon,
-      pickable: true,
-      stroked: true,
+      pickable: true,   
       filled: true,
       wireframe: true,
       lineWidthMinPixels: 1,
+      extruded:true,
       getPolygon: d => d.location.coordinates,     
+      getElevation: d => Math.floor(Math.random() * (100) ),
       getFillColor: d => colors[Math.floor(Math.random() * (10) )],
-      getLineColor: [179, 255, 0],
-      getLineWidth: 1
+      getLineColor: [255, 255, 255]      
     }):null,
     selectionFilterLine?new LineLayer({
       id: 'line-layer',
@@ -66,12 +71,13 @@ const colorsrgba=["#ffffff","#88d1a4","#abdda4","#e6f598","#ffffbf","#fee08b","#
       id: 'column-layer',
       data: DataSetFiltered,
       diskResolution: 10,
-      radius: 15,
+      radius: 6,
       extruded: true,
       pickable: true,
       elevationScale: 0,
-      getPosition: d => d.location.coordinates,
-      getFillColor: d => colors[Math.floor(Math.random() * (11 + 1) )],//DEBIAR CAMBIAR EL COLOR      
+      getPosition: d => d.location.coordinates,      
+      getFillColor: d => {console.log(d?.value)
+        return colors[Math.floor(Math.random() * (11 + 1) )]},//DEBIAR CAMBIAR EL COLOR      
       getElevation: d => 1
     }):null
     
@@ -174,7 +180,7 @@ const colorsrgba=["#ffffff","#88d1a4","#abdda4","#e6f598","#ffffbf","#fee08b","#
   return ( <div>
       <DeckGL
         initialViewState= { viewState }
-       // onViewStateChange={e => setViewState(e.viewState)}
+        //onViewStateChange={e => setViewState(e.viewState)}
         controller={true}
         layers={layers}
         ContextProvider={MapContext.Provider}        

@@ -17,10 +17,10 @@ export class DataContext extends React.Component {
   constructor(props) {
     super(props);
     this.state={hasNDX:false};
-    console.log("aoaoaoaoaoao")
+    //console.log("aoaoaoaoaoao")
   }
   componentDidMount(){
-    console.log("repayaso")
+   // console.log("repayaso")
       if (this.state.hasNDX){
           return
       }
@@ -29,10 +29,10 @@ export class DataContext extends React.Component {
       this.setState({hasNDX:true})            
   }
   componentWillUnmount() {
-    console.log("Bye");
+    //console.log("Bye");
   }
   render() {
-    console.log("render")
+    //console.log("render")
       if(!this.state.hasNDX){
           return null;
       }
