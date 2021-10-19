@@ -4,7 +4,7 @@ import {extent, scaleLinear,scaleTime, timeMonth,timeParse ,max} from "d3";
 import { ChartTemplate } from "./chartTemplate";
 import './../App.css';
 import {selectDataFiltered,setDataFilterd} from "./../redux/slice/Data";
-const MoveChartFunc = (divRef, ndx,dispatch) => {  
+const MoveChartFunc = (divRef, ndx,dispatch,groupNode,groupPoly) => {  
   const dateFmt = timeParse("%d-%m-%Y %H:%M:%S");
  
   const moveChart = dc.lineChart(divRef);  
@@ -22,17 +22,9 @@ const MoveChartFunc = (divRef, ndx,dispatch) => {
   const dimNode          = ndx.dimension((f) => f.codnode);
   const GroupNodes       = dimNode.group().reduceSum((d) => +1);
 
- /* const datanew=ndx.all().map((item)=>{
-     const d=GroupNodes.all().find((it)=>item.codnode==it.key)               
-     return {
-       ...item,
-       value: d.value
-     }
-  })
- 
-  dispatch(setDataFilterd(datanew));  */
 
 
+  console.log(groupPoly.top(Infinity))
   moveChart  
     .width(1450)
     .height(150)
@@ -44,16 +36,10 @@ const MoveChartFunc = (divRef, ndx,dispatch) => {
     .colors(["#f46d43"])    
     .on("filtered", function() {
       
-      dispatch(setDataFilterd(dimTime.top(Infinity)));    
-               
-      /*  const newdatafilter=dimTime.top(Infinity).map((item) =>{            
-          const d=GroupNodes.all().find((it)=>item.codnode==it.key)               
-          return {
-            ...item,
-            value: d.value
-          }
-      });    
-      dispatch(setDataFilterd(newdatafilter)); */
+     // dispatch(setDataFilterd(dimTime.top(Infinity)));  
+     console.log(groupPoly.top(Infinity))  
+     console.log(groupNode.top(Infinity));          
+ 
       
   })     
     .clipPadding(10)     

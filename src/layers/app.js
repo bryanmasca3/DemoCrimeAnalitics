@@ -102,12 +102,13 @@ const colorsrgba=["#fff","#fbffd2","#fef4ba","#ffeea4","#ffe08a","#fcda7b","#fdc
       }
     }
     const res = await axios.post('http://localhost:4000/api/data/polygon', polygon);
-
+    console.log(res.data.Node)
+    console.log(res.data.Edge)
+    console.log(res.data.Block)
     dispatch(setDataFilterd(res.data.Node))              
     setselectionMarked(0);
-    setdataEdge(res.data.Edge);
-    setdataPolygon(res.data.Block)
-   // console.log(res.data)
+    //setdataEdge(res.data.Edge);
+    //setdataPolygon(res.data.Block)   
     setpolygonMarker([])
     event.stopPropagation();
     

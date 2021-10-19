@@ -4,6 +4,8 @@ import * as dc from "dc";
 import {useSelector,useDispatch} from 'react-redux';
 import {selectDataFiltered,setDataFilterd} from "./../redux/slice/Data";
 
+
+
 const ResetButton = props => {
 
   return (
@@ -23,10 +25,35 @@ export const ChartTemplate = props => {
   const [chart,updateChart] = React.useState(null);
   const ndx = context.ndx;
   const div = React.useRef(null);
+
+  var dimNode   = ndx.dimension((d) => d["location"].coordinates);
+  var groupNode = dimNode.group();
   
-  React.useEffect(() => {
-   // console.log('ohhhhhhhhhhhhhhhhhhhhhhhhhhhhhh')
-    const newChart = props.chartFunction(div.current, ndx,dispatch); 
+  var dimPoly   = ndx.dimension((d) => d["idpolygons"]);
+  var groupPoly = dimPoly.group();
+  
+  /*DATA*/
+  var subsetGroup=groupPoly.top(Infinity).reduce(function(a,b) {
+    var c=b["key"].map((item)=>{return{"key":item,"value":b["value"]}})
+    return a.concat(c);
+  },[]);
+  
+  var result = [];
+
+  subsetGroup.reduce(function(res, b) {
+    if (!res[b.key]) {
+      res[b.key] = { "key": b.key, "value": 0 };
+      result.push(res[b.key])
+    }
+    res[b.key].value += b.value;
+    return res;
+  }, {});
+
+  console.log(result)
+  /*DATA*/
+
+  React.useEffect(() => {   
+    const newChart = props.chartFunction(div.current, ndx,dispatch,groupNode,groupPoly); 
     newChart.render();
     updateChart(newChart);
   },[]);

@@ -3,11 +3,12 @@ import * as dc from "dc";
 import { ChartTemplate } from "./chartTemplate";
 import './../App.css';
 import {selectDataFiltered,setDataFilterd} from "./../redux/slice/Data";
-const dayOfWeekFunc = (divRef, ndx,dispatch) => {
+const dayOfWeekFunc = (divRef, ndx,dispatch,groupNode,groupPoly) => {
     const dayOfWeekChart = dc.rowChart(divRef)
     //data.map(a=>a.atribute.map(item=>dataParse.push({"date":item.Fecha})))
     var dimCrimeType     = ndx.dimension((d) =>d.Type);
     var CrimeTypes       = dimCrimeType.group();
+
 
     dayOfWeekChart
     .dimension(dimCrimeType)
@@ -19,10 +20,9 @@ const dayOfWeekFunc = (divRef, ndx,dispatch) => {
     .renderTitle(true)
     .title(function(d) { return d.key + "  " + d.value })
     .colors(["#3e6be0"])
-    .on("filtered", function() {
-        //console.log("payasp")
-        dispatch(setDataFilterd(dimCrimeType.top(Infinity)));    
-        //console.log(dimTime.top(Infinity))
+    .on("filtered", function() {        
+        //dispatch(setDataFilterd(dimCrimeType.top(Infinity)));            
+        console.log(groupNode.top(Infinity));      
   })     
     dayOfWeekChart.title(function(d){
         let keyvalue = d.key+" "+d.value;
