@@ -15,15 +15,16 @@ import {selectDataFiltered,setDataFilterd} from "./../redux/slice/Data";
 
 
 
-const submenu=()=>{
-
-}
 const AppLayer=()=> {     
   const [selectionMarked, setselectionMarked] = useState(0);
 
-  const [selectionFilterPoint, setselectionFilterPoint] = useState(1);
+  const [selectionFilterPoint, setselectionFilterPoint] = useState(1);  
   const [selectionFilterLine, setselectionFilterLine] = useState(1);
   const [selectionFilterPolygon, setselectionFilterPolygon] = useState(0);
+
+
+  const [pointsubmenu, setpointsubmenu] = useState(0);
+  const [cubesubmenu, setcubesubmenu] = useState(0);
 
   const DataSetFiltered = useSelector(selectDataFiltered);
   const dispatch = useDispatch();
@@ -53,8 +54,9 @@ const colorsrgba=["#fff","#fbffd2","#fef4ba","#ffeea4","#ffe08a","#fcda7b","#fdc
       wireframe: true,
       lineWidthMinPixels: 1,
       extruded:true,
+      elevationScale: selectionFilterPolygon==1?0:1,
       getPolygon: d => d.location.coordinates,     
-      getElevation: d => Math.floor(Math.random() * (100) ),
+      getElevation: d => selectionFilterPolygon==1?1:Math.floor(Math.random() * (100) ),
       getFillColor: d => colors[Math.floor(Math.random() * (10) )],
       getLineColor: [255, 255, 255]      
     }):null,
@@ -70,32 +72,17 @@ const colorsrgba=["#fff","#fbffd2","#fef4ba","#ffeea4","#ffe08a","#fcda7b","#fdc
     selectionFilterPoint?new ColumnLayer({
       id: 'column-layer',
       data: DataSetFiltered,
-      diskResolution: 10,
+      diskResolution: 5,
       radius: 6,
       extruded: true,
       pickable: true,
-      elevationScale: 0,
+      elevationScale: selectionFilterPoint==1?0:1,
       getPosition: d => d.location.coordinates,      
-      getFillColor: d => {console.log(d?.value)
-        return colors[Math.floor(Math.random() * (11 + 1) )]},//DEBIAR CAMBIAR EL COLOR      
-      getElevation: d => 1
+      getFillColor: d => colors[Math.floor(Math.random() * (11 + 1) )],     
+      getElevation: d => selectionFilterPoint==1?1:Math.floor(Math.random() * (100) ),
     }):null
     
-   /* new GeoJsonLayer({
-      id: 'geojson-layer',
-      data:datasa,
-      pickable: true,
-      stroked: false,
-      filled: true,      
-      pointType: 'circle',
-      lineWidthScale: 20,
-      lineWidthMinPixels: 2,
-      getFillColor: [0, 0, 205, 200],
-      getLineColor: d => [179, 255, 0],
-      getPointRadius: 100,
-      getLineWidth: 1,
-      getElevation: 30
-    })*/
+
    
   ];
   const  handlerPolygon=async(event)=>{
@@ -125,6 +112,29 @@ const colorsrgba=["#fff","#fbffd2","#fef4ba","#ffeea4","#ffe08a","#fcda7b","#fdc
     event.stopPropagation();
     
   }
+
+const SubmenuPoint=()=>{    
+    return(
+      <div style={{top:10,left:50,zIndex:1,backgroundColor:"#fff",border:"1px solid #5e5ef4",borderRadius:"10px",position:"absolute"}}>
+          <div style={{display:'flex',flexDirection:"row"}}>
+            <div onClick={()=>selectionFilterPoint===1?setselectionFilterPoint(0):setselectionFilterPoint(1)} className={`icons__footer color__marked ${selectionFilterPoint===1?"color__marked-selected":""}`}> <i class={`"uil uil-elipsis-double-v-alt ${selectionFilterPoint===1?"color__marked__icon-selected":""}`}></i></div>                            
+            <div onClick={()=>selectionFilterPoint===2?setselectionFilterPoint(0):setselectionFilterPoint(2)}  className={`icons__footer color__marked  ${selectionFilterPoint===2?"color__marked-selected":""}`}><i class={`uil uil-graph-bar ${selectionFilterPoint===2?"color__marked__icon-selected":""}`}></i></div>     
+            {/*<div onClick={()=>selectionFilterPoint?setselectionFilterPoint(0):setselectionFilterPoint(1)} className={`icons__footer color__marked ${selectionFilterPoint?"color__marked-selected":""}`}><i class={`uil uil-map-pin ${selectionFilterPoint?"color__marked__icon-selected":""}`}></i></div>*/}                                                  
+        </div>
+      </div>      
+    )
+}
+const SubmenuCube=()=>{
+  
+  return(
+    <div style={{top:80,left:50,zIndex:1,backgroundColor:"#fff",border:"1px solid #5e5ef4",borderRadius:"10px",position:"absolute"}}>
+        <div style={{display:'flex',flexDirection:"row"}}>             
+          <div onClick={()=>selectionFilterPolygon===1?setselectionFilterPolygon(0):setselectionFilterPolygon(1)} className={`icons__footer color__marked  ${selectionFilterPolygon===1?"color__marked-selected":""}`}><i class={`"uil uil-square-full  ${selectionFilterPolygon===1?"color__marked__icon-selected":""}`}></i> </div> 
+          <div onClick={()=>selectionFilterPolygon===2?setselectionFilterPolygon(0):setselectionFilterPolygon(2)} className={`icons__footer color__marked  ${selectionFilterPolygon===2?"color__marked-selected":""}`}> <i class={`"uil uil-cube ${selectionFilterPolygon===2?"color__marked__icon-selected":""}`}></i>   </div>                                      
+      </div>
+    </div>      
+  )
+}
   const handleClick = async({ coordinate }) => {
     switch(selectionMarked) {
        case 1:
@@ -212,12 +222,22 @@ const colorsrgba=["#fff","#fbffd2","#fef4ba","#ffeea4","#ffe08a","#fcda7b","#fdc
         </div> 
 
         <div style={{zIndex:1000,cursor:"pointer",position:"absolute",backgroundColor:"#fff",top:10,left:10,border:"1px solid #5e5ef4",borderRadius:"10px",boxShadow:"1px 1px 10px #b9b9b9"}}>
-            <div style={{display:'flex',flexDirection:"column"}}>                
+            <div style={{display:'flex',flexDirection:"column"}}>  
+              
+            <div onClick={()=>pointsubmenu?setpointsubmenu(0):setpointsubmenu(1)} className={`icons__footer color__marked ${selectionFilterPoint?"color__marked-selected":""}`}><i className={`uil uil-map-pin ${selectionFilterPoint?"color__marked__icon-selected":""}`}></i></div>                            
+            <div onClick={()=>selectionFilterLine?setselectionFilterLine(0):setselectionFilterLine(1)} className={`icons__footer color__marked ${selectionFilterLine?"color__marked-selected":""}`}><i className={`uil uil uil-line-alt ${selectionFilterLine?"color__marked__icon-selected":""}`}></i></div>                            
+            <div onClick={()=>cubesubmenu?setcubesubmenu(0):setcubesubmenu(1)} className={`icons__footer color__marked ${selectionFilterPolygon?"color__marked-selected":""}`}><i className={`uil uil-square-full ${selectionFilterPolygon?"color__marked__icon-selected":""}`}></i></div>                 
+               { /*  
                 <div onClick={()=>selectionFilterPoint?setselectionFilterPoint(0):setselectionFilterPoint(1)} className={`icons__footer color__marked ${selectionFilterPoint?"color__marked-selected":""}`}><i class={`uil uil-map-pin ${selectionFilterPoint?"color__marked__icon-selected":""}`}></i></div>                            
                 <div onClick={()=>selectionFilterLine?setselectionFilterLine(0):setselectionFilterLine(1)} className={`icons__footer color__marked ${selectionFilterLine?"color__marked-selected":""}`}><i class={`uil uil uil-line-alt ${selectionFilterLine?"color__marked__icon-selected":""}`}></i></div>                            
-                <div onClick={()=>selectionFilterPolygon?setselectionFilterPolygon(0):setselectionFilterPolygon(1)} className={`icons__footer color__marked ${selectionFilterPolygon?"color__marked-selected":""}`}><i class={`uil uil-square-full ${selectionFilterPolygon?"color__marked__icon-selected":""}`}></i></div>                            
+               
+               <div onClick={()=>selectionFilterPolygon?setselectionFilterPolygon(0):setselectionFilterPolygon(1)} className={`icons__footer color__marked ${selectionFilterPolygon?"color__marked-selected":""}`}><i class={`uil uil-square-full ${selectionFilterPolygon?"color__marked__icon-selected":""}`}></i></div>  */    }                  
             </div>       
+
         </div> 
+        {pointsubmenu?<SubmenuPoint/>:null}
+        {cubesubmenu?<SubmenuCube/>:null}
+
         {polygonMarker.map((item)=>
             <Marker latitude={item.latitude} longitude={item.longitude} onClick={handlerPolygon}>
               <i class="uil uil-square-full color__marked"></i>
