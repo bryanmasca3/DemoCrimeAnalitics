@@ -1,8 +1,7 @@
 import React from "react";
 import { CXContext } from "./cxContext";
 import * as dc from "dc";
-import {useSelector,useDispatch} from 'react-redux';
-import {selectDataFiltered,setDataFilterd} from "./../redux/slice/Data";
+import {useDispatch} from 'react-redux';
 
 
 
@@ -20,20 +19,24 @@ const ResetButton = props => {
   );
 };
 export const ChartTemplate = props => {
+  
   const dispatch = useDispatch();
   const context = React.useContext(CXContext);
   const [chart,updateChart] = React.useState(null);
   const ndx = context.ndx;
   const div = React.useRef(null);
+  var dimNode   = ndx.dimension((d) => d["location"].coordinates);  
+  var dimPoly   = ndx.dimension((d) => d["idpolygons"]);
 
-  var dimNode   = ndx.dimension((d) => d["location"].coordinates);
+  /*var dimNode   = ndx.dimension((d) => d["location"].coordinates);
   var groupNode = dimNode.group();
   
   var dimPoly   = ndx.dimension((d) => d["idpolygons"]);
-  var groupPoly = dimPoly.group();
+  var groupPoly = dimPoly.group();*/
+  
   
   /*DATA*/
-  var subsetGroup=groupPoly.top(Infinity).reduce(function(a,b) {
+  /*var subsetGroup=groupPoly.top(Infinity).reduce(function(a,b) {
     var c=b["key"].map((item)=>{return{"key":item,"value":b["value"]}})
     return a.concat(c);
   },[]);
@@ -49,11 +52,10 @@ export const ChartTemplate = props => {
     return res;
   }, {});
 
-  console.log(result)
+  console.log(result)*/
   /*DATA*/
-
   React.useEffect(() => {   
-    const newChart = props.chartFunction(div.current, ndx,dispatch,groupNode,groupPoly); 
+    const newChart = props.chartFunction(div.current, ndx,dispatch,dimPoly,dimNode);     
     newChart.render();
     updateChart(newChart);
   },[]);

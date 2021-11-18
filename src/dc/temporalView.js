@@ -1,10 +1,14 @@
 import React,{useState} from "react";
 import * as dc from "dc";
-import {extent, scaleLinear,scaleTime, timeMonth,timeParse ,max} from "d3";
+import {scaleLinear,scaleTime, timeMonth,timeParse ,max} from "d3";
 import { ChartTemplate } from "./chartTemplate";
 import './../App.css';
-import {selectDataFiltered,setDataFilterd} from "./../redux/slice/Data";
-const MoveChartFunc = (divRef, ndx,dispatch,groupNode,groupPoly) => {  
+import {setmaxPolygonAmount,setmaxNodeAmount,setPointData,setPrePolygonData} from "./../redux/slice/Data";
+
+const MoveChartFunc = (divRef, ndx,dispatch,dimPoly,dimNode) => {  
+
+ 
+
   const dateFmt = timeParse("%d-%m-%Y %H:%M:%S");
  
   const moveChart = dc.lineChart(divRef);  
@@ -19,12 +23,6 @@ const MoveChartFunc = (divRef, ndx,dispatch,groupNode,groupPoly) => {
   const yMin          = 0;
   const yMax          = max(times.all(), (f)=> f.value )    
 
-  const dimNode          = ndx.dimension((f) => f.codnode);
-  const GroupNodes       = dimNode.group().reduceSum((d) => +1);
-
-
-
-  console.log(groupPoly.top(Infinity))
   moveChart  
     .width(1450)
     .height(150)
@@ -34,13 +32,45 @@ const MoveChartFunc = (divRef, ndx,dispatch,groupNode,groupPoly) => {
     .y(scaleLinear().domain([yMin, yMax]))  
     .renderArea(true)
     .colors(["#f46d43"])    
-    .on("filtered", function() {
-      
-     // dispatch(setDataFilterd(dimTime.top(Infinity)));  
-     console.log(groupPoly.top(Infinity))  
-     console.log(groupNode.top(Infinity));          
+    .on("filtered", async function() {
  
+      var result = [];
+      var result2 = [];
+
+      var subsetGroup=dimPoly.top(Infinity).reduce(function(a, b) {
+        var c=b["idpolygons"].map((item)=>{return{"key":item,"value":1}})        
+        return a.concat(c);
+      }, []);
       
+      subsetGroup.reduce(function(res,b){
+        if (!res[b.key]) {
+          res[b.key] = { "key": b.key, "value": 0};
+          result2.push(res[b.key])
+        }
+        res[b.key].value += b.value;
+        return res;
+      },{});
+
+      dimNode.top(Infinity).reduce(function(res, b) {
+        if (!res[b["location"].coordinates]) {
+          res[b["location"].coordinates] = { "key": b["location"].coordinates, "value": 0 };
+          result.push(res[b["location"].coordinates])
+        }     
+        res[b["location"].coordinates].value += 1;
+        return res;
+      }, {});
+      
+      const MaxPoint          = max(result, (f)=> f.value )  
+      const MaxPolygon          = max(result2, (f)=> f.value )  
+
+
+      dispatch(setmaxNodeAmount(MaxPoint))
+      dispatch(setmaxPolygonAmount(MaxPolygon?MaxPolygon+2:1))
+      dispatch(setPointData(result))
+      dispatch(setPrePolygonData(result2))
+      
+      //console.log(dimNode.group().all())
+      //dispatch(setPointData(dimNode.group().all()))
   })     
     .clipPadding(10)     
     .dimension(dimTime)      
@@ -61,6 +91,7 @@ const MoveChartFunc = (divRef, ndx,dispatch,groupNode,groupPoly) => {
 
 export const TemporalView = ()  => {
   const [isShowTempView, setisShowTempView]=useState(false); 
+  
   return(<>
     <div className="button__temp-view" onClick={()=>setisShowTempView(!isShowTempView)}><i class="uil uil-chart-line"></i> </div>        
     <div className={`temporal__view ${isShowTempView?"temporal__view-show":"temporal__view-close"}` }>      

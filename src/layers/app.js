@@ -1,17 +1,17 @@
-import React,{useState,useEffect} from 'react';
-import {StaticMap, MapContext, NavigationControl,Marker} from 'react-map-gl';
+import React,{useState} from 'react';
+import {StaticMap, MapContext,Marker} from 'react-map-gl';
 import './../App.css';
 import DeckGL from 'deck.gl';
 import {MAPBOX_TOKEN,MAP_STYLE}from "./../constants/variables";
-import {NAV_CONTROL_STYLE} from "./../utils/control";
-import {ColumnLayer,LineLayer,GeoJsonLayer,PolygonLayer} from '@deck.gl/layers';
+
+import {ColumnLayer,LineLayer,PolygonLayer} from '@deck.gl/layers';
 //import {columnLayerCustom} from "./columnLayer";
 //import {lineLayerCustom} from "./lineLayer";
 import Dashboard from "./../dc/dashboard";
 
 import axios from 'axios';
-import {useSelector,useDispatch} from 'react-redux';
-import {selectDataFiltered,setDataFilterd} from "./../redux/slice/Data";
+import {useSelector} from 'react-redux';
+import {selectPointData,selectPrePolygonData,selectmaxPolygonAmount,selectmaxNodeAmount} from "./../redux/slice/Data";
 
 
 
@@ -26,26 +26,32 @@ const AppLayer=()=> {
   const [pointsubmenu, setpointsubmenu] = useState(0);
   const [cubesubmenu, setcubesubmenu] = useState(0);
 
-  const DataSetFiltered = useSelector(selectDataFiltered);
-  const dispatch = useDispatch();
+  const PointData = useSelector(selectPointData);
+  const PrePolygonData = useSelector(selectPrePolygonData);
+  const maxPolygonAmount = useSelector(selectmaxPolygonAmount);
+  const maxNodeAmount = useSelector(selectmaxNodeAmount);
+  
+
   let stateCircle=0;
   const [polygonMarker, setpolygonMarker] = useState([]);
 
   const [viewState, setViewState] = useState({
-    longitude: -87.68393218513461/* -46.66708952168912*/,
-    latitude: 41.83339250270142/*-23.558393625659015*/,
+    longitude: /*-87.68393218513461 */ -46.66708952168912,
+    latitude: /*41.83339250270142*/-23.558393625659015,
     zoom: 10,
     bearing: 0
   });
  // console.log(datasa)
   //const [dataTest, setdataTest] = useState([]);
+  const [alldata, setalldata] = useState([]);
+
   const [dataEdge, setdataEdge] = useState([]);
   const [dataPolygon, setdataPolygon] = useState([]);
 
 const colors=[[255,255,255,255],[251,255,210,255],[254,244,186,255],[255,238,164,255],[255,224,138,255],[252,218,123,255],[253,200,86,255],[251,120,74,255],[255,93,60,255],[255,63,63,255],[252,44,44,255]]
 const colorsrgba=["#fff","#fbffd2","#fef4ba","#ffeea4","#ffe08a","#fcda7b","#fdc856","#fb784a","#ff5d3c","#ff3f3f","#fc2c2c"]
 
-  const layers = [
+  /*const layers = [
     selectionFilterPolygon?new PolygonLayer({
       id: 'polygon-layer',
       data:dataPolygon,
@@ -81,9 +87,49 @@ const colorsrgba=["#fff","#fbffd2","#fef4ba","#ffeea4","#ffe08a","#fcda7b","#fdc
       getFillColor: d => colors[Math.floor(Math.random() * (11 + 1) )],     
       getElevation: d => selectionFilterPoint==1?1:Math.floor(Math.random() * (100) ),
     }):null
-    
+  ];*/
 
-   
+  const layers = [
+    selectionFilterPolygon?new PolygonLayer({
+      id: 'polygon-layer',
+     /* data:dataPolygon.filter(item => {const resul=PrePolygonData?.find( dat => dat.key === item.osmid );
+                                                        item["value"]=resul?.value;
+                                                        return resul}),*/
+      data:dataPolygon,                                           
+      pickable: true,   
+      filled: true,
+      wireframe: true,
+      lineWidthMinPixels: 1,
+      extruded:true,
+      elevationScale: selectionFilterPolygon===1?0:10,
+      getPolygon: d =>d.location.coordinates,     
+      //getElevation: d => selectionFilterPolygon===1?1:d.value,
+      //getFillColor: d => colors[parseInt((d.value*(colors.length-1))/maxPolygonAmount)],
+      getElevation: d => Math.floor(Math.random() * (30) ),
+      getFillColor: d => colors[Math.floor(Math.random() * (10) )],
+      getLineColor: [255, 255, 255]      
+    }):null,
+    selectionFilterLine?new LineLayer({
+      id: 'line-layer',
+      data: dataEdge,
+      pickable: true,
+      getWidth: 1,
+      getSourcePosition: d => d.location.coordinates[0],
+      getTargetPosition: d => d.location.coordinates[1],
+      getColor: d =>  [207, 153, 81]
+    }):null,
+    selectionFilterPoint?new ColumnLayer({
+      id: 'column-layer',
+      data: PointData,
+      diskResolution: 5,
+      radius: 6,
+      extruded: true,
+      pickable: true,
+      elevationScale: selectionFilterPoint===1?0:3,
+      getPosition: d => d.key,      
+      getFillColor: d => colors[parseInt((d.value*(colors.length-1))/maxNodeAmount)],     
+      getElevation: d => selectionFilterPoint===1?1:d.value,
+    }):null
   ];
   const  handlerPolygon=async(event)=>{
   
@@ -102,14 +148,18 @@ const colorsrgba=["#fff","#fbffd2","#fef4ba","#ffeea4","#ffe08a","#fcda7b","#fdc
       }
     }
     const res = await axios.post('http://localhost:4000/api/data/polygon', polygon);
-    console.log(res.data.Node)
-    console.log(res.data.Edge)
-    console.log(res.data.Block)
-    dispatch(setDataFilterd(res.data.Node))              
+    //console.log(res.data.Node)
+    //console.log(res.data.Edge)
+    //console.log(res.data.Block)
+   // dispatch(setDataFilterd(res.data.Node))      
+    setalldata(res.data.Node);        
+    setdataEdge(res.data.Edge);
+    setdataPolygon(res.data.Block);
+ 
+
     setselectionMarked(0);
-    //setdataEdge(res.data.Edge);
-    //setdataPolygon(res.data.Block)   
     setpolygonMarker([])
+
     event.stopPropagation();
     
   }
@@ -141,9 +191,12 @@ const SubmenuCube=()=>{
        case 1:
          {
              const res = await axios.get('http://localhost:4000/api/data/all/');              
-             dispatch(setDataFilterd(res.data.Node)); 
+             //dispatch(setDataFilterd(res.data.Node)); 
+             setalldata(res.data.Node);
              setdataEdge(res.data.Edge); 
              setdataPolygon(res.data.Block)  
+
+             
              setselectionMarked(0);                
          break;}
        case 2:
@@ -158,10 +211,11 @@ const SubmenuCube=()=>{
             };       
             const res = await axios.post('http://localhost:4000/api/data/circle/', coordinateXY);
             stateCircle=!stateCircle;
-            dispatch(setDataFilterd(res.data.Node));
+            
+            setalldata(res.data.Node);
             setdataEdge(res.data.Edge);   
             setdataPolygon(res.data.Block)
-            //console.log(res.data)
+            
             setselectionMarked(0);   
            }
                         
@@ -178,7 +232,8 @@ const SubmenuCube=()=>{
          break;}
          case 4:
              {               
-              dispatch(setDataFilterd([])) 
+              //dispatch(setDataFilterd([])) 
+              setalldata([]);
               setdataEdge([]);  
               setdataPolygon([]); 
              break;}
@@ -245,6 +300,6 @@ const SubmenuCube=()=>{
             </Marker>
           )}                                
       </DeckGL>
-      <Dashboard data={DataSetFiltered} state={DataSetFiltered.length}/> </div>)
+      <Dashboard data={alldata} state={alldata.length}/> </div>)
 }
 export default AppLayer;

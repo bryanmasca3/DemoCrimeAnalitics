@@ -1,8 +1,7 @@
 import React from "react";
 import * as crossfilter from "crossfilter2";
-import {csv,timeFormat,timeParse,format} from 'd3'
+import {timeFormat,timeParse,format} from 'd3'
 import "dc/dc.css";
-import datasss from './../data/crimes.csv';
 
 export const CXContext = React.createContext("CXContext");
 export const  dateFormatSpecifier = '%m/%d/%Y';

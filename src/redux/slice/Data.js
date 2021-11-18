@@ -1,19 +1,18 @@
 import { createSlice } from '@reduxjs/toolkit'
 
 const initialState = {
-  dataFiltered:0,
-  PointData:[],
-  PolygonData:[],
-  CrimeData:[]
+  PointData:0,
+  PolygonData:0,
+  PrePolygonData:0,
+  CrimeData:0,
+  maxPolygonAmount:0,
+  maxNodeAmount:0,
 }
 
 export const byDataFilteredSlice = createSlice({
   name: 'selector',
   initialState,
   reducers: {
-    setDataFilterd: (state, action) => {
-      state.dataFiltered = action.payload
-    },
     setPointData: (state, action) => {
       state.PointData = action.payload
     },
@@ -22,17 +21,29 @@ export const byDataFilteredSlice = createSlice({
     },
     setCrimeData: (state, action) => {
       state.CrimeData = action.payload
+    },
+    setPrePolygonData: (state, action) => {
+      state.PrePolygonData = action.payload
+    },
+    setmaxPolygonAmount: (state, action) => {
+      state.maxPolygonAmount = action.payload
+    },
+    setmaxNodeAmount: (state, action) => {
+      state.maxNodeAmount = action.payload
     }
 
   },
 })
 
-export const {/*setDataFilterd,*/setPointData,setPolygonData,setCrimeData} = byDataFilteredSlice.actions;
+export const {setmaxPolygonAmount,setmaxNodeAmount,setPointData,setPolygonData,setCrimeData,setPrePolygonData} = byDataFilteredSlice.actions;
 
 //export const selectDataFiltered = (state)=>state.dataFilteredSlice.dataFiltered;
 
 export const selectPointData = (state)=>state.dataFilteredSlice.PointData;
 export const selectPolygonData = (state)=>state.dataFilteredSlice.PolygonData;
 export const selectCrimeData = (state)=>state.dataFilteredSlice.CrimeData;
+export const selectPrePolygonData = (state)=>state.dataFilteredSlice.PrePolygonData;
+export const selectmaxPolygonAmount = (state)=>state.dataFilteredSlice.maxPolygonAmount;
+export const selectmaxNodeAmount = (state)=>state.dataFilteredSlice.maxNodeAmount;
 
 export default byDataFilteredSlice.reducer
