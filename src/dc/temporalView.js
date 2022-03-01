@@ -5,7 +5,7 @@ import { ChartTemplate } from "./chartTemplate";
 import './../App.css';
 import {setmaxPolygonAmount,setmaxNodeAmount,setPointData,setPrePolygonData} from "./../redux/slice/Data";
 
-const MoveChartFunc = (divRef, ndx,dispatch,dimPoly,dimNode) => {  
+const MoveChartFunc = (divRef, ndx,dispatch,dimPoly,dimNode,datasetpolygon) => {  
 
  
 
@@ -23,6 +23,7 @@ const MoveChartFunc = (divRef, ndx,dispatch,dimPoly,dimNode) => {
   const yMin          = 0;
   const yMax          = max(times.all(), (f)=> f.value )    
 
+
   moveChart  
     .width(1450)
     .height(150)
@@ -35,9 +36,9 @@ const MoveChartFunc = (divRef, ndx,dispatch,dimPoly,dimNode) => {
     .on("filtered", async function() {
  
       var result = [];
-      var result2 = [];
-
-      var subsetGroup=dimPoly.top(Infinity).reduce(function(a, b) {
+      //var result2 = [];
+     // console.log(datasetpolygon);
+     /* var subsetGroup=dimPoly.top(Infinity).reduce(function(a, b) {
         var c=b["idpolygons"].map((item)=>{return{"key":item,"value":1}})        
         return a.concat(c);
       }, []);
@@ -49,7 +50,7 @@ const MoveChartFunc = (divRef, ndx,dispatch,dimPoly,dimNode) => {
         }
         res[b.key].value += b.value;
         return res;
-      },{});
+      },{});*/
 
       dimNode.top(Infinity).reduce(function(res, b) {
         if (!res[b["location"].coordinates]) {
@@ -61,13 +62,14 @@ const MoveChartFunc = (divRef, ndx,dispatch,dimPoly,dimNode) => {
       }, {});
       
       const MaxPoint          = max(result, (f)=> f.value )  
-      const MaxPolygon          = max(result2, (f)=> f.value )  
+     // const MaxPolygon          = max(result2, (f)=> f.value )  
 
 
       dispatch(setmaxNodeAmount(MaxPoint))
-      dispatch(setmaxPolygonAmount(MaxPolygon?MaxPolygon+2:1))
+     // dispatch(setmaxPolygonAmount(MaxPolygon?MaxPolygon+2:1))
       dispatch(setPointData(result))
-      dispatch(setPrePolygonData(result2))
+      //dispatch(setPrePolygonData(datasetpolygon))
+      //dispatch(setPrePolygonData(result2))
       
       //console.log(dimNode.group().all())
       //dispatch(setPointData(dimNode.group().all()))
@@ -89,13 +91,13 @@ const MoveChartFunc = (divRef, ndx,dispatch,dimPoly,dimNode) => {
     return moveChart;
 };
 
-export const TemporalView = ()  => {
+export const TemporalView = ({datasetpolygon})  => {
   const [isShowTempView, setisShowTempView]=useState(false); 
   
   return(<>
     <div className="button__temp-view" onClick={()=>setisShowTempView(!isShowTempView)}><i class="uil uil-chart-line"></i> </div>        
     <div className={`temporal__view ${isShowTempView?"temporal__view-show":"temporal__view-close"}` }>      
-            <ChartTemplate chartFunction={MoveChartFunc} title="Monthly Price Moves"/>        
+            <ChartTemplate chartFunction={MoveChartFunc} title="Monthly Price Moves" datasetpolygon={datasetpolygon}/>        
       </div>
       </>
       

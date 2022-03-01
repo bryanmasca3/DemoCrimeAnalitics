@@ -4,7 +4,7 @@ import { store } from './redux/store';
 import { Provider } from 'react-redux';
 
 const  App =()=>{
-    return (
+    return (      
       <Provider store={store}>          
          < AppLayer/> 
       </Provider>

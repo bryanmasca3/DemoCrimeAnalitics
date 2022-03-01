@@ -1,22 +1,29 @@
-import React,{useState} from 'react';
+import React,{useState,useEffect} from 'react';
 import {StaticMap, MapContext,Marker} from 'react-map-gl';
 import './../App.css';
 import DeckGL from 'deck.gl';
-import {MAPBOX_TOKEN,MAP_STYLE}from "./../constants/variables";
+import {MAPBOX_TOKEN,MAP_STYLE,MAP_STYLE1}from "./../constants/variables";
 
 import {ColumnLayer,LineLayer,PolygonLayer} from '@deck.gl/layers';
 //import {columnLayerCustom} from "./columnLayer";
 //import {lineLayerCustom} from "./lineLayer";
 import Dashboard from "./../dc/dashboard";
+import {useDispatch} from 'react-redux';
 
 import axios from 'axios';
 import {useSelector} from 'react-redux';
-import {selectPointData,selectPrePolygonData,selectmaxPolygonAmount,selectmaxNodeAmount} from "./../redux/slice/Data";
+import {selectPointData,selectPrePolygonData,selectmaxPolygonAmount,selectmaxNodeAmount,setPrePolygonData} from "./../redux/slice/Data";
 
 
 
 const AppLayer=()=> {     
+  const dispatch = useDispatch();
+  
+  const dif=0.00002
+
   const [selectionMarked, setselectionMarked] = useState(0);
+
+  const [selectionMap, setselectionMap] = useState(0);
 
   const [selectionFilterPoint, setselectionFilterPoint] = useState(1);  
   const [selectionFilterLine, setselectionFilterLine] = useState(1);
@@ -27,7 +34,7 @@ const AppLayer=()=> {
   const [cubesubmenu, setcubesubmenu] = useState(0);
 
   const PointData = useSelector(selectPointData);
-  const PrePolygonData = useSelector(selectPrePolygonData);
+ // const PolygonData = useSelector(selectPrePolygonData);
   const maxPolygonAmount = useSelector(selectmaxPolygonAmount);
   const maxNodeAmount = useSelector(selectmaxNodeAmount);
   
@@ -36,8 +43,8 @@ const AppLayer=()=> {
   const [polygonMarker, setpolygonMarker] = useState([]);
 
   const [viewState, setViewState] = useState({
-    longitude: /*-87.68393218513461 */ -46.66708952168912,
-    latitude: /*41.83339250270142*/-23.558393625659015,
+    longitude: -87.68393218513461/*-46.66708952168912*/,
+    latitude: 41.83339250270142/*-23.558393625659015*/,
     zoom: 10,
     bearing: 0
   });
@@ -48,47 +55,47 @@ const AppLayer=()=> {
   const [dataEdge, setdataEdge] = useState([]);
   const [dataPolygon, setdataPolygon] = useState([]);
 
+  const [selectPolygon, setselectPolygon] = useState([]);
 const colors=[[255,255,255,255],[251,255,210,255],[254,244,186,255],[255,238,164,255],[255,224,138,255],[252,218,123,255],[253,200,86,255],[251,120,74,255],[255,93,60,255],[255,63,63,255],[252,44,44,255]]
 const colorsrgba=["#fff","#fbffd2","#fef4ba","#ffeea4","#ffe08a","#fcda7b","#fdc856","#fb784a","#ff5d3c","#ff3f3f","#fc2c2c"]
+const transformCoordinates=(coordinates)=>{
 
-  /*const layers = [
-    selectionFilterPolygon?new PolygonLayer({
-      id: 'polygon-layer',
-      data:dataPolygon,
-      pickable: true,   
-      filled: true,
-      wireframe: true,
-      lineWidthMinPixels: 1,
-      extruded:true,
-      elevationScale: selectionFilterPolygon==1?0:1,
-      getPolygon: d => d.location.coordinates,     
-      getElevation: d => selectionFilterPolygon==1?1:Math.floor(Math.random() * (100) ),
-      getFillColor: d => colors[Math.floor(Math.random() * (10) )],
-      getLineColor: [255, 255, 255]      
-    }):null,
-    selectionFilterLine?new LineLayer({
-      id: 'line-layer',
-      data: dataEdge,
-      pickable: true,
-      getWidth: 1,
-      getSourcePosition: d => d.location.coordinates[0],
-      getTargetPosition: d => d.location.coordinates[1],
-      getColor: d =>  [207, 153, 81]//DEBIAR CAMBIAR EL COLOR
-    }):null,
-    selectionFilterPoint?new ColumnLayer({
-      id: 'column-layer',
-      data: DataSetFiltered,
-      diskResolution: 5,
-      radius: 6,
-      extruded: true,
-      pickable: true,
-      elevationScale: selectionFilterPoint==1?0:1,
-      getPosition: d => d.location.coordinates,      
-      getFillColor: d => colors[Math.floor(Math.random() * (11 + 1) )],     
-      getElevation: d => selectionFilterPoint==1?1:Math.floor(Math.random() * (100) ),
-    }):null
-  ];*/
+  let arrayData=[]
+  let arrayDataFinal=[]
 
+
+
+  let x1=0
+  let y1=0
+
+  let x2=0
+  let y2=0
+
+  let Xmid=0
+  let Ymid=0
+
+  let newX=0
+  let newY=0
+  for (let i = 0; i < coordinates.length-1; i++) {
+    x1=coordinates[i][0]
+    y1=coordinates[i][1]
+
+    x2=coordinates[i+1][0]
+    y2=coordinates[i+1][1]
+
+    Xmid=parseFloat(((x1+x2)/2).toFixed(7))
+    Ymid=parseFloat(((y1+y2)/2).toFixed(7))    
+
+    newX=parseFloat((x2<Xmid?x2+dif:x2-dif).toFixed(7))
+    newY=parseFloat((y2<Ymid?y2+dif:y2-dif).toFixed(7))
+
+    arrayData.push([newX,newY])
+ }
+ arrayData.unshift(arrayData[arrayData.length-1])
+ arrayDataFinal.push(arrayData)
+  
+ return arrayDataFinal
+}
   const layers = [
     selectionFilterPolygon?new PolygonLayer({
       id: 'polygon-layer',
@@ -100,13 +107,26 @@ const colorsrgba=["#fff","#fbffd2","#fef4ba","#ffeea4","#ffe08a","#fcda7b","#fdc
       filled: true,
       wireframe: true,
       lineWidthMinPixels: 1,
-      extruded:true,
+      extruded:true,      
       elevationScale: selectionFilterPolygon===1?0:10,
-      getPolygon: d =>d.location.coordinates,     
+      getPolygon: d => transformCoordinates(d.location.coordinates[0]),   
+      onClick: (info) => {  
+        info.object.selected=true
+        console.log( info.object)
+        setselectPolygon([...selectPolygon,info.object])},
       //getElevation: d => selectionFilterPolygon===1?1:d.value,
       //getFillColor: d => colors[parseInt((d.value*(colors.length-1))/maxPolygonAmount)],
       getElevation: d => Math.floor(Math.random() * (30) ),
-      getFillColor: d => colors[Math.floor(Math.random() * (10) )],
+      //getFillColor: d => colors[Math.floor(Math.random() * (10) )],
+      updateTriggers: {
+        // This tells deck.gl to recalculate radius when `currentYear` changes
+        getFillColor: [selectPolygon]
+      },
+      getFillColor: d => {console.log(d)
+      
+        return d.selected ? [100, 105, 155] : [55, 205, 155]}, //
+      //getFillColor: d => [, 100]    ,
+      //getFillColor: d => {return [253,200,86, 100]},
       getLineColor: [255, 255, 255]      
     }):null,
     selectionFilterLine?new LineLayer({
@@ -122,7 +142,7 @@ const colorsrgba=["#fff","#fbffd2","#fef4ba","#ffeea4","#ffe08a","#fcda7b","#fdc
       id: 'column-layer',
       data: PointData,
       diskResolution: 5,
-      radius: 6,
+      radius: 3,
       extruded: true,
       pickable: true,
       elevationScale: selectionFilterPoint===1?0:3,
@@ -132,14 +152,15 @@ const colorsrgba=["#fff","#fbffd2","#fef4ba","#ffeea4","#ffe08a","#fcda7b","#fdc
     }):null
   ];
   const  handlerPolygon=async(event)=>{
-  
+    //console.log(polygonMarker)
     polygonMarker.shift()                              
     polygonMarker.push(polygonMarker[0])
     const polygon={
       geometry:{
         type : "Polygon",
         coordinates : [
-          polygonMarker.map((item)=>[item.longitude,item.latitude])
+          polygonMarker.map((item)=>{//console.log(item)
+            return[item.longitude,item.latitude]})
       ],
       crs: {
         type: "name",
@@ -194,9 +215,7 @@ const SubmenuCube=()=>{
              //dispatch(setDataFilterd(res.data.Node)); 
              setalldata(res.data.Node);
              setdataEdge(res.data.Edge); 
-             setdataPolygon(res.data.Block)  
-
-             
+             setdataPolygon(res.data.Block);               
              setselectionMarked(0);                
          break;}
        case 2:
@@ -243,7 +262,7 @@ const SubmenuCube=()=>{
      } 
    
    };
-  return ( <div>
+  return ( <>
       <DeckGL
         initialViewState= { viewState }
         //onViewStateChange={e => setViewState(e.viewState)}
@@ -251,8 +270,14 @@ const SubmenuCube=()=>{
         layers={layers}
         ContextProvider={MapContext.Provider}        
         onClick={handleClick}
-        >            
-          <StaticMap  mapStyle={MAP_STYLE} mapboxApiAccessToken={MAPBOX_TOKEN} />          
+        >     
+         <StaticMap  mapStyle={!selectionMap?MAP_STYLE:MAP_STYLE1} mapboxApiAccessToken={MAPBOX_TOKEN} />  
+          <div style={{zIndex:1000,cursor:"pointer",position:"absolute",backgroundColor:"#fff",top:"40%",right:10,border:"1px solid #5e5ef4",borderRadius:"10px",boxShadow:"1px 1px 10px #b9b9b9"}}>
+          <div style={{display:'flex',flexDirection:"column"}}>                                
+                <div  onClick={()=>selectionMap===1?setselectionMap(0):setselectionMap(1)} className={`icons__footer color__marked ${selectionMap===1?"color__marked-selected":""}`}><i class={`uil uil-image ${selectionMap===1?"color__marked__icon-selected":""}`}></i></div>       
+                <div  onClick={()=>selectionMap===0?setselectionMap(1):setselectionMap(0)} className={`icons__footer color__marked ${selectionMap===0?"color__marked-selected":""}`}><i class={`uil uil-image-times ${selectionMap===0?"color__marked__icon-selected":""}`}></i></div>                 
+            </div>   
+          </div>                 
           <div style={{zIndex:1000,cursor:"pointer",position:"absolute",backgroundColor:"#fff",bottom:10,right:10,border:"1px solid #5e5ef4",borderRadius:"10px",boxShadow:"1px 1px 10px #b9b9b9"}}>
             <div style={{display:'flex',flexDirection:"column"}}>                                
                 <div onClick={()=>selectionMarked===1?setselectionMarked(0):setselectionMarked(1)} className={`icons__footer color__marked ${selectionMarked===1?"color__marked-selected":""}`}><i class={`uil uil-map ${selectionMarked===1?"color__marked__icon-selected":""}`}></i></div>       
@@ -300,6 +325,10 @@ const SubmenuCube=()=>{
             </Marker>
           )}                                
       </DeckGL>
-      <Dashboard data={alldata} state={alldata.length}/> </div>)
+      <Dashboard 
+          data={alldata} 
+          polygon={dataPolygon} 
+          state={alldata.length}/> 
+          </>)
 }
 export default AppLayer;
