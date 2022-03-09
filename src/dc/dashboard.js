@@ -2,6 +2,7 @@ import React from 'react'
 import {DataContext}  from "./cxContext";
 import { TemporalView} from "./temporalView";
 import { ChartView} from "./barchartView";
+import BarchartAmenitiesView from "./barchartAmenitiesView";
 import './../App.css';
 
  const Dashboard = ({data,state,polygon})=>{    
@@ -13,7 +14,8 @@ import './../App.css';
           {state&&<DataContext 
                 dataset={data} > 
               <TemporalView datasetpolygon={polygon}/>
-              <ChartView datasetpolygon={polygon}/></DataContext>}
+              <ChartView datasetpolygon={polygon}/>
+              <BarchartAmenitiesView/></DataContext>}
       </>
     );
 }

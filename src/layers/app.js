@@ -12,7 +12,7 @@ import {useDispatch} from 'react-redux';
 
 import axios from 'axios';
 import {useSelector} from 'react-redux';
-import {selectPointData,selectPrePolygonData,selectmaxPolygonAmount,selectmaxNodeAmount,setPrePolygonData} from "./../redux/slice/Data";
+import {selectPointData,selectmaxPolygonAmount,selectmaxNodeAmount} from "./../redux/slice/Data";
 
 
 
@@ -48,6 +48,7 @@ const AppLayer=()=> {
     zoom: 10,
     bearing: 0
   });
+  const [slider, setslider] = useState(255);
  // console.log(datasa)
   //const [dataTest, setdataTest] = useState([]);
   const [alldata, setalldata] = useState([]);
@@ -110,21 +111,22 @@ const transformCoordinates=(coordinates)=>{
       extruded:true,      
       elevationScale: selectionFilterPolygon===1?0:10,
       getPolygon: d => transformCoordinates(d.location.coordinates[0]),   
-      onClick: (info) => {  
+     /* onClick: (info) => {  
         info.object.selected=true
         console.log( info.object)
-        setselectPolygon([...selectPolygon,info.object])},
+        setslider(50)
+        setselectPolygon([...selectPolygon,info.object])},*/
       //getElevation: d => selectionFilterPolygon===1?1:d.value,
       //getFillColor: d => colors[parseInt((d.value*(colors.length-1))/maxPolygonAmount)],
-      getElevation: d => Math.floor(Math.random() * (30) ),
-      //getFillColor: d => colors[Math.floor(Math.random() * (10) )],
-      updateTriggers: {
+      getElevation: d => Math.floor(Math.random() * (10) ),
+      getFillColor: d => colors[Math.floor(Math.random() * (10) )],
+     /* updateTriggers: {
         // This tells deck.gl to recalculate radius when `currentYear` changes
         getFillColor: [selectPolygon]
-      },
-      getFillColor: d => {console.log(d)
+      },*/
+    /*  getFillColor: d => {console.log(d)
       
-        return d.selected ? [100, 105, 155] : [55, 205, 155]}, //
+        return d.selected ? [100, 105, 155,(slider*255)/100] :  [100, 105, 155]}, //*/
       //getFillColor: d => [, 100]    ,
       //getFillColor: d => {return [253,200,86, 100]},
       getLineColor: [255, 255, 255]      
@@ -209,7 +211,7 @@ const SubmenuCube=()=>{
 }
   const handleClick = async({ coordinate }) => {
     switch(selectionMarked) {
-       case 1:
+      /* case 1:
          {
              const res = await axios.get('http://localhost:4000/api/data/all/');              
              //dispatch(setDataFilterd(res.data.Node)); 
@@ -217,7 +219,7 @@ const SubmenuCube=()=>{
              setdataEdge(res.data.Edge); 
              setdataPolygon(res.data.Block);               
              setselectionMarked(0);                
-         break;}
+         break;}*/
        case 2:
          {               
            if(!stateCircle){
@@ -272,7 +274,7 @@ const SubmenuCube=()=>{
         onClick={handleClick}
         >     
          <StaticMap  mapStyle={!selectionMap?MAP_STYLE:MAP_STYLE1} mapboxApiAccessToken={MAPBOX_TOKEN} />  
-          <div style={{zIndex:1000,cursor:"pointer",position:"absolute",backgroundColor:"#fff",top:"40%",right:10,border:"1px solid #5e5ef4",borderRadius:"10px",boxShadow:"1px 1px 10px #b9b9b9"}}>
+          <div style={{zIndex:1000,cursor:"pointer",position:"absolute",backgroundColor:"#fff",top:"20%",left:10,border:"1px solid #5e5ef4",borderRadius:"10px",boxShadow:"1px 1px 10px #b9b9b9"}}>
           <div style={{display:'flex',flexDirection:"column"}}>                                
                 <div  onClick={()=>selectionMap===1?setselectionMap(0):setselectionMap(1)} className={`icons__footer color__marked ${selectionMap===1?"color__marked-selected":""}`}><i class={`uil uil-image ${selectionMap===1?"color__marked__icon-selected":""}`}></i></div>       
                 <div  onClick={()=>selectionMap===0?setselectionMap(1):setselectionMap(0)} className={`icons__footer color__marked ${selectionMap===0?"color__marked-selected":""}`}><i class={`uil uil-image-times ${selectionMap===0?"color__marked__icon-selected":""}`}></i></div>                 
@@ -280,7 +282,7 @@ const SubmenuCube=()=>{
           </div>                 
           <div style={{zIndex:1000,cursor:"pointer",position:"absolute",backgroundColor:"#fff",bottom:10,right:10,border:"1px solid #5e5ef4",borderRadius:"10px",boxShadow:"1px 1px 10px #b9b9b9"}}>
             <div style={{display:'flex',flexDirection:"column"}}>                                
-                <div onClick={()=>selectionMarked===1?setselectionMarked(0):setselectionMarked(1)} className={`icons__footer color__marked ${selectionMarked===1?"color__marked-selected":""}`}><i class={`uil uil-map ${selectionMarked===1?"color__marked__icon-selected":""}`}></i></div>       
+               {/* <div onClick={()=>selectionMarked===1?setselectionMarked(0):setselectionMarked(1)} className={`icons__footer color__marked ${selectionMarked===1?"color__marked-selected":""}`}><i class={`uil uil-map ${selectionMarked===1?"color__marked__icon-selected":""}`}></i></div>       */}
                 <div onClick={()=>selectionMarked===2?setselectionMarked(0):setselectionMarked(2)} className={`icons__footer color__marked ${selectionMarked===2?"color__marked-selected":""}`}><i class={`uil uil-circle ${selectionMarked===2?"color__marked__icon-selected":""}`}></i></div>
                 <div onClick={()=>selectionMarked===3?setselectionMarked(0):setselectionMarked(3)} className={`icons__footer color__marked ${selectionMarked===3?"color__marked-selected":""}`}><i class={`uil uil-polygon ${selectionMarked===3?"color__marked__icon-selected":""}`}></i></div>                                                               
                 <div onClick={()=>selectionMarked===4?setselectionMarked(0):setselectionMarked(4)} className={`icons__footer color__marked ${selectionMarked===4?"color__marked-selected":""}`}><i class={`uil uil-trash-alt ${selectionMarked===4?"color__marked__icon-selected":""}`}></i></div>       

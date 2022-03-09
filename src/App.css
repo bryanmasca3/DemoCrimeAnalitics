@@ -36,7 +36,7 @@
   left: 10px;  
   color: #fff;
   font-weight: 500;
-  padding: 15px;
+  padding: 10px;
   cursor: pointer;
   border-radius: 50%;
 }
@@ -53,9 +53,33 @@
   transition: .3s ;
 
 }
+.histogram__view_amenities{
+  z-index: 100;
+  position:absolute;
+  background-color:#fff;
+  top:320px;
+  right:30px;
+  border:1px solid #5e5ef4;
+  border-radius:10px;
+  box-shadow:1px 1px 10px #b9b9b9;
+  transition: .3s ;
+
+}
+.histogram__view_amenities ul{
+  list-style: none;
+}
+.histogram__view-show_amenities{
+  width:15%;
+  height:250px;  
+}
+.histogram__view-close_amenities{
+  width:0%;
+  display: none;  
+  height:0px;
+}
 .histogram__view-show{
-  width:20%;
-  height:450px;  
+  width:15%;
+  height:250px;  
 }
 .histogram__view-close{
   width:0%;
@@ -71,7 +95,19 @@
   color: #fff;
   cursor: pointer;
   font-weight: 500;
-  padding: 15px;
+  padding: 10px;
+  border-radius: 50%;
+}
+.button__histogram-view_amenities{
+  background-color: #5e5ef4;
+  position: absolute;  
+  top: 300px;  
+  z-index: 1000;
+  right: 10px;  
+  color: #fff;
+  cursor: pointer;
+  font-weight: 500;
+  padding: 10px;
   border-radius: 50%;
 }
 .color__marked{

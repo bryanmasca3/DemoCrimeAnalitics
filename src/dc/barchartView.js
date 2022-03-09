@@ -1,6 +1,6 @@
 import React,{useState} from "react";
 import * as dc from "dc";
-import {max} from "d3";
+import {max,scaleLinear} from "d3";
 import { ChartTemplate } from "./chartTemplate";
 import {setmaxPolygonAmount,setmaxNodeAmount,setPointData,setPrePolygonData} from "./../redux/slice/Data";
 import './../App.css';
@@ -11,17 +11,19 @@ const dayOfWeekFunc = (divRef, ndx,dispatch,dimPoly,dimNode,datasetpolygon) => {
     var dimCrimeType     = ndx.dimension((d) =>d.Type);
     var CrimeTypes       = dimCrimeType.group();
 
+    const xMax          = max(CrimeTypes.all(), (f)=> f.value ) 
     //console.log(groupNode.top(Infinity));  
     dayOfWeekChart
     .dimension(dimCrimeType)
     .group(CrimeTypes)
-    .width(330)
-    .height(450)
-    .transitionDuration(1000)
+    .width(250)
+    .height(250)
     .margins({top: 10, right: 40, bottom: 25, left: 10})
     .renderTitle(true)
     .title(function(d) { return d.key + "  " + d.value })    
-    .rowsCap(5)
+    .rowsCap(5)    
+    .x(scaleLinear().domain([0,xMax]))
+    .elasticX(true)
     .ordinalColors(['#708036', '#9F9F45', '#BFB155', '#DFB265', '#FFAE76']) 
     .othersGrouper(false)  
     .on("filtered", function() {        
@@ -62,10 +64,7 @@ const dayOfWeekFunc = (divRef, ndx,dispatch,dimPoly,dimNode,datasetpolygon) => {
        // dispatch(setPrePolygonData(result2))
         
   })     
-    dayOfWeekChart.title(function(d){
-        let keyvalue = d.key+" "+d.value;
-        return keyvalue;
-    });
+
     return dayOfWeekChart
 }
 
