@@ -218,7 +218,7 @@ const transformCoordinates=(coordinates)=>{
     setdataPolygon(res.data.Block);
     setdataAmenity(res.data.Amenity);
     setdataBuild(res.data.Builds);
-
+    
     setselectionMarked(0);
     setpolygonMarker([])
 

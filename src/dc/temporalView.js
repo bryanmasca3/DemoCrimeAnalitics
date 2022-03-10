@@ -9,7 +9,8 @@ const MoveChartFunc = (divRef, ndx,dispatch,dimPoly,dimNode,datasetpolygon) => {
 
  
 
-  const dateFmt = timeParse("%d-%m-%Y %H:%M:%S");
+  //const dateFmt = timeParse("%d-%m-%Y %H:%M:%S");
+  const dateFmt = timeParse("%d-%m-%Y");
  
   const moveChart = dc.lineChart(divRef);  
   
