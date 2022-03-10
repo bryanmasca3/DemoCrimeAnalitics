@@ -19,14 +19,19 @@ import {selectPointData,selectmaxPolygonAmount,selectmaxNodeAmount} from "./../r
 const AppLayer=()=> {     
   const dispatch = useDispatch();
   
-  const dif=0.00002
+  //const dif=0.00002
+  const dif=0
 
   const [selectionMarked, setselectionMarked] = useState(0);
 
   const [selectionMap, setselectionMap] = useState(0);
 
-  const [selectionFilterPoint, setselectionFilterPoint] = useState(1);  
+  const [selectionFilterPoint, setselectionFilterPoint] = useState(0);  
   const [selectionFilterLine, setselectionFilterLine] = useState(1);
+
+  const [selectionFilterBuild, setselectionFilterBuild] = useState(0);
+  const [selectionFilterAmenity, setselectionFilterAmenity] = useState(0);
+
   const [selectionFilterPolygon, setselectionFilterPolygon] = useState(0);
 
 
@@ -43,9 +48,9 @@ const AppLayer=()=> {
   const [polygonMarker, setpolygonMarker] = useState([]);
 
   const [viewState, setViewState] = useState({
-    longitude: -87.68393218513461/*-46.66708952168912*/,
-    latitude: 41.83339250270142/*-23.558393625659015*/,
-    zoom: 10,
+    longitude: /*-87.68393218513461-46.66708952168912*/-73.977857,
+    latitude: /*41.83339250270142-23.558393625659015*/40.731603,
+    zoom: /*10*/15,
     bearing: 0
   });
   const [slider, setslider] = useState(255);
@@ -55,10 +60,12 @@ const AppLayer=()=> {
 
   const [dataEdge, setdataEdge] = useState([]);
   const [dataPolygon, setdataPolygon] = useState([]);
+  const [dataAmenity, setdataAmenity] = useState([]);
+  const [dataBuild, setdataBuild] = useState([]);
 
   const [selectPolygon, setselectPolygon] = useState([]);
 const colors=[[255,255,255,255],[251,255,210,255],[254,244,186,255],[255,238,164,255],[255,224,138,255],[252,218,123,255],[253,200,86,255],[251,120,74,255],[255,93,60,255],[255,63,63,255],[252,44,44,255]]
-const colorsrgba=["#fff","#fbffd2","#fef4ba","#ffeea4","#ffe08a","#fcda7b","#fdc856","#fb784a","#ff5d3c","#ff3f3f","#fc2c2c"]
+const colorsrgba=["#f8f8f8","#fbffd2","#fef4ba","#ffeea4","#ffe08a","#fcda7b","#fdc856","#fb784a","#ff5d3c","#ff3f3f","#fc2c2c"]
 const transformCoordinates=(coordinates)=>{
 
   let arrayData=[]
@@ -98,6 +105,23 @@ const transformCoordinates=(coordinates)=>{
  return arrayDataFinal
 }
   const layers = [
+    selectionFilterBuild?new PolygonLayer({
+      id: 'polygon-layer',
+     /* data:dataPolygon.filter(item => {const resul=PrePolygonData?.find( dat => dat.key === item.osmid );
+                                                        item["value"]=resul?.value;
+                                                        return resul}),*/
+      data:dataBuild,                                           
+      pickable: true,   
+      filled: true,
+      wireframe: true,
+      lineWidthMinPixels: 1,
+      extruded:true,      
+      elevationScale: 5,
+      getPolygon: d => transformCoordinates(d.location.coordinates[0]),       
+      getElevation: d => 5,
+      getFillColor: d => [0,255,0,100], 
+      getLineColor: [255, 255, 255]      
+    }):null,
     selectionFilterPolygon?new PolygonLayer({
       id: 'polygon-layer',
      /* data:dataPolygon.filter(item => {const resul=PrePolygonData?.find( dat => dat.key === item.osmid );
@@ -111,26 +135,27 @@ const transformCoordinates=(coordinates)=>{
       extruded:true,      
       elevationScale: selectionFilterPolygon===1?0:10,
       getPolygon: d => transformCoordinates(d.location.coordinates[0]),   
-     /* onClick: (info) => {  
+      onClick: (info) => {  
         info.object.selected=true
         console.log( info.object)
         setslider(50)
-        setselectPolygon([...selectPolygon,info.object])},*/
+        setselectPolygon([...selectPolygon,info.object])},
       //getElevation: d => selectionFilterPolygon===1?1:d.value,
       //getFillColor: d => colors[parseInt((d.value*(colors.length-1))/maxPolygonAmount)],
       getElevation: d => Math.floor(Math.random() * (10) ),
-      getFillColor: d => colors[Math.floor(Math.random() * (10) )],
-     /* updateTriggers: {
+     // getFillColor: d => colors[Math.floor(Math.random() * (10) )],
+      updateTriggers: {
         // This tells deck.gl to recalculate radius when `currentYear` changes
         getFillColor: [selectPolygon]
-      },*/
-    /*  getFillColor: d => {console.log(d)
+      },
+      getFillColor: d => {console.log(d)
       
-        return d.selected ? [100, 105, 155,(slider*255)/100] :  [100, 105, 155]}, //*/
+        return d.selected ? [100, 105, 155,(slider*255)/100] :  [100, 105, 155]}, //
       //getFillColor: d => [, 100]    ,
       //getFillColor: d => {return [253,200,86, 100]},
       getLineColor: [255, 255, 255]      
     }):null,
+   
     selectionFilterLine?new LineLayer({
       id: 'line-layer',
       data: dataEdge,
@@ -150,6 +175,18 @@ const transformCoordinates=(coordinates)=>{
       elevationScale: selectionFilterPoint===1?0:3,
       getPosition: d => d.key,      
       getFillColor: d => colors[parseInt((d.value*(colors.length-1))/maxNodeAmount)],     
+      getElevation: d => selectionFilterPoint===1?1:d.value,
+    }):null,
+    selectionFilterAmenity?new ColumnLayer({
+      id: 'column-layer',
+      data: dataAmenity,
+      diskResolution: 5,
+      radius: 3,
+      extruded: true,
+      pickable: true,
+      elevationScale: selectionFilterPoint===1?0:3,
+      getPosition: d => d.location.coordinates,      
+      getFillColor: d => [0,0,0,255],     
       getElevation: d => selectionFilterPoint===1?1:d.value,
     }):null
   ];
@@ -175,10 +212,12 @@ const transformCoordinates=(coordinates)=>{
     //console.log(res.data.Edge)
     //console.log(res.data.Block)
    // dispatch(setDataFilterd(res.data.Node))      
-    setalldata(res.data.Node);        
+    setalldata(res.data.Node);       
+    console.log(res.data.Node); 
     setdataEdge(res.data.Edge);
     setdataPolygon(res.data.Block);
- 
+    setdataAmenity(res.data.Amenity);
+    setdataBuild(res.data.Builds);
 
     setselectionMarked(0);
     setpolygonMarker([])
@@ -257,6 +296,8 @@ const SubmenuCube=()=>{
               setalldata([]);
               setdataEdge([]);  
               setdataPolygon([]); 
+              setdataBuild([]); 
+              setdataAmenity([]); 
              break;}
        default:
          {       
@@ -274,7 +315,7 @@ const SubmenuCube=()=>{
         onClick={handleClick}
         >     
          <StaticMap  mapStyle={!selectionMap?MAP_STYLE:MAP_STYLE1} mapboxApiAccessToken={MAPBOX_TOKEN} />  
-          <div style={{zIndex:1000,cursor:"pointer",position:"absolute",backgroundColor:"#fff",top:"20%",left:10,border:"1px solid #5e5ef4",borderRadius:"10px",boxShadow:"1px 1px 10px #b9b9b9"}}>
+          <div style={{zIndex:1000,cursor:"pointer",position:"absolute",backgroundColor:"#fff",top:200,left:10,border:"1px solid #5e5ef4",borderRadius:"10px",boxShadow:"1px 1px 10px #b9b9b9"}}>
           <div style={{display:'flex',flexDirection:"column"}}>                                
                 <div  onClick={()=>selectionMap===1?setselectionMap(0):setselectionMap(1)} className={`icons__footer color__marked ${selectionMap===1?"color__marked-selected":""}`}><i class={`uil uil-image ${selectionMap===1?"color__marked__icon-selected":""}`}></i></div>       
                 <div  onClick={()=>selectionMap===0?setselectionMap(1):setselectionMap(0)} className={`icons__footer color__marked ${selectionMap===0?"color__marked-selected":""}`}><i class={`uil uil-image-times ${selectionMap===0?"color__marked__icon-selected":""}`}></i></div>                 
@@ -288,20 +329,55 @@ const SubmenuCube=()=>{
                 <div onClick={()=>selectionMarked===4?setselectionMarked(0):setselectionMarked(4)} className={`icons__footer color__marked ${selectionMarked===4?"color__marked-selected":""}`}><i class={`uil uil-trash-alt ${selectionMarked===4?"color__marked__icon-selected":""}`}></i></div>       
             </div>       
         </div>  
-        <div style={{zIndex:1000,cursor:"pointer",position:"absolute",backgroundColor:"#fff",top:280,left:10,boxShadow:"1px 1px 10px #b9b9b9"}}>
+        <div style={{zIndex:1000,cursor:"pointer",position:"absolute",backgroundColor:"#fff",top:300,left:10,boxShadow:"1px 1px 10px #b9b9b9",fontSize:"0.65rem",padding:"10px 0px"}}>
+          <div style={{display:'flex',justifyContent:"space-around",fontWeight:"600",padding:"2px 0px"}}>
+            <div className="color-bars">Global</div>                            
+            <div className="color-bars">Local</div>  
+          </div>
+          <div style={{display:'flex'}}>
+            <div style={{display:'flex',flexDirection:"column",justifyContent:"space-between"}}>                                        
+                <div className="color-bars">550 -</div>                            
+                <div className="color-bars">500 -</div>     
+                <div className="color-bars">450 -</div>                            
+                <div className="color-bars">400 -</div>                            
+                <div className="color-bars">350 -</div>   
+                <div className="color-bars">300 -</div>                            
+                <div className="color-bars">250 -</div>                            
+                <div className="color-bars">200 -</div>   
+                <div className="color-bars">150 -</div>                            
+                <div className="color-bars">100 -</div> 
+                <div className="color-bars">50 -</div> 
+            </div>
             <div style={{display:'flex',flexDirection:"column"}}>                
-                <div className="color-bars" style={{"background-color":colorsrgba[0]}}></div>                            
-                <div className="color-bars" style={{"background-color":colorsrgba[1]}}></div>                            
-                <div className="color-bars" style={{"background-color":colorsrgba[2]}}></div>     
-                <div className="color-bars" style={{"background-color":colorsrgba[3]}}></div>                            
-                <div className="color-bars" style={{"background-color":colorsrgba[4]}}></div>                            
-                <div className="color-bars" style={{"background-color":colorsrgba[5]}}></div>   
-                <div className="color-bars" style={{"background-color":colorsrgba[6]}}></div>                            
-                <div className="color-bars" style={{"background-color":colorsrgba[7]}}></div>                            
-                <div className="color-bars" style={{"background-color":colorsrgba[8]}}></div>   
+                <div className="color-bars with" style={{"background-color":"#e5e5e5"}}></div>                                                                                                             
+            </div>     
+            <div style={{display:'flex',flexDirection:"column",justifyContent:"space-between"}}>              
+                <div className="color-bars">110 -</div>                            
+                <div className="color-bars">100 -</div>     
+                <div className="color-bars">90 -</div>                            
+                <div className="color-bars">80 -</div>                            
+                <div className="color-bars">70 -</div>   
+                <div className="color-bars">60 -</div>                            
+                <div className="color-bars">50 -</div>                            
+                <div className="color-bars">40 -</div>   
+                <div className="color-bars">30 -</div>                            
+                <div className="color-bars">20 -</div> 
+                <div className="color-bars">10 -</div> 
+            </div>
+            <div style={{display:'flex',flexDirection:"column" ,justifyContent:"space-between"}}>                
+                <div className="color-bars" style={{"background-color":colorsrgba[10]}}></div>                            
                 <div className="color-bars" style={{"background-color":colorsrgba[9]}}></div>                            
-                <div className="color-bars" style={{"background-color":colorsrgba[10]}}></div>                                                                   
-            </div>       
+                <div className="color-bars" style={{"background-color":colorsrgba[8]}}></div>     
+                <div className="color-bars" style={{"background-color":colorsrgba[7]}}></div>                            
+                <div className="color-bars" style={{"background-color":colorsrgba[6]}}></div>                            
+                <div className="color-bars" style={{"background-color":colorsrgba[5]}}></div>   
+                <div className="color-bars" style={{"background-color":colorsrgba[4]}}></div>                            
+                <div className="color-bars" style={{"background-color":colorsrgba[3]}}></div>                            
+                <div className="color-bars" style={{"background-color":colorsrgba[2]}}></div>   
+                <div className="color-bars" style={{"background-color":colorsrgba[1]}}></div>                            
+                <div className="color-bars" style={{"background-color":colorsrgba[0]}}></div>                                                                   
+            </div>    
+          </div>           
         </div> 
 
         <div style={{zIndex:1000,cursor:"pointer",position:"absolute",backgroundColor:"#fff",top:10,left:10,border:"1px solid #5e5ef4",borderRadius:"10px",boxShadow:"1px 1px 10px #b9b9b9"}}>
@@ -310,6 +386,8 @@ const SubmenuCube=()=>{
             <div onClick={()=>pointsubmenu?setpointsubmenu(0):setpointsubmenu(1)} className={`icons__footer color__marked ${selectionFilterPoint?"color__marked-selected":""}`}><i className={`uil uil-map-pin ${selectionFilterPoint?"color__marked__icon-selected":""}`}></i></div>                            
             <div onClick={()=>selectionFilterLine?setselectionFilterLine(0):setselectionFilterLine(1)} className={`icons__footer color__marked ${selectionFilterLine?"color__marked-selected":""}`}><i className={`uil uil uil-line-alt ${selectionFilterLine?"color__marked__icon-selected":""}`}></i></div>                            
             <div onClick={()=>cubesubmenu?setcubesubmenu(0):setcubesubmenu(1)} className={`icons__footer color__marked ${selectionFilterPolygon?"color__marked-selected":""}`}><i className={`uil uil-square-full ${selectionFilterPolygon?"color__marked__icon-selected":""}`}></i></div>                 
+            <div onClick={()=>selectionFilterBuild?setselectionFilterBuild(0):setselectionFilterBuild(1)} className={`icons__footer color__marked ${selectionFilterBuild?"color__marked-selected":""}`}><i className={`uil uil-building ${selectionFilterBuild?"color__marked__icon-selected":""}`}></i></div>                 
+            <div onClick={()=>selectionFilterAmenity?setselectionFilterAmenity(0):setselectionFilterAmenity(1)} className={`icons__footer color__marked ${selectionFilterAmenity?"color__marked-selected":""}`}><i className={`uil uil-location-arrow-alt ${selectionFilterAmenity?"color__marked__icon-selected":""}`}></i></div>                 
                { /*  
                 <div onClick={()=>selectionFilterPoint?setselectionFilterPoint(0):setselectionFilterPoint(1)} className={`icons__footer color__marked ${selectionFilterPoint?"color__marked-selected":""}`}><i class={`uil uil-map-pin ${selectionFilterPoint?"color__marked__icon-selected":""}`}></i></div>                            
                 <div onClick={()=>selectionFilterLine?setselectionFilterLine(0):setselectionFilterLine(1)} className={`icons__footer color__marked ${selectionFilterLine?"color__marked-selected":""}`}><i class={`uil uil uil-line-alt ${selectionFilterLine?"color__marked__icon-selected":""}`}></i></div>                            
