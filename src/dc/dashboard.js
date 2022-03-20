@@ -5,7 +5,7 @@ import { ChartView} from "./barchartView";
 import BarchartAmenitiesView from "./barchartAmenitiesView";
 import './../App.css';
 
- const Dashboard = ({data,state,polygon})=>{    
+ const Dashboard = ({data,state,polygon,dataAmenities})=>{    
 
     return (
       <>

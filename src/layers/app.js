@@ -2,8 +2,9 @@ import React,{useState,useEffect} from 'react';
 import {StaticMap, MapContext,Marker} from 'react-map-gl';
 import './../App.css';
 import DeckGL from 'deck.gl';
+import 'rc-slider/assets/index.css';
 import {MAPBOX_TOKEN,MAP_STYLE,MAP_STYLE1}from "./../constants/variables";
-
+import Slider from 'rc-slider';
 import {ColumnLayer,LineLayer,PolygonLayer} from '@deck.gl/layers';
 //import {columnLayerCustom} from "./columnLayer";
 //import {lineLayerCustom} from "./lineLayer";
@@ -34,6 +35,7 @@ const AppLayer=()=> {
 
   const [selectionFilterPolygon, setselectionFilterPolygon] = useState(0);
 
+  const [valueSlider, setvalueSlider] = useState(50);
 
   const [pointsubmenu, setpointsubmenu] = useState(0);
   const [cubesubmenu, setcubesubmenu] = useState(0);
@@ -53,7 +55,7 @@ const AppLayer=()=> {
     zoom: /*10*/15,
     bearing: 0
   });
-  const [slider, setslider] = useState(255);
+  //const [slider, setslider] = useState(255);
  // console.log(datasa)
   //const [dataTest, setdataTest] = useState([]);
   const [alldata, setalldata] = useState([]);
@@ -138,7 +140,7 @@ const transformCoordinates=(coordinates)=>{
       onClick: (info) => {  
         info.object.selected=true
         console.log( info.object)
-        setslider(50)
+        //setslider(50)
         setselectPolygon([...selectPolygon,info.object])},
       //getElevation: d => selectionFilterPolygon===1?1:d.value,
       //getFillColor: d => colors[parseInt((d.value*(colors.length-1))/maxPolygonAmount)],
@@ -146,11 +148,11 @@ const transformCoordinates=(coordinates)=>{
      // getFillColor: d => colors[Math.floor(Math.random() * (10) )],
       updateTriggers: {
         // This tells deck.gl to recalculate radius when `currentYear` changes
-        getFillColor: [selectPolygon]
+        getFillColor: [selectPolygon,valueSlider]
       },
       getFillColor: d => {console.log(d)
       
-        return d.selected ? [100, 105, 155,(slider*255)/100] :  [100, 105, 155]}, //
+        return d.selected ? [100, 105, 155,valueSlider] :  [100, 105, 155]}, //
       //getFillColor: d => [, 100]    ,
       //getFillColor: d => {return [253,200,86, 100]},
       getLineColor: [255, 255, 255]      
@@ -190,9 +192,66 @@ const transformCoordinates=(coordinates)=>{
       getElevation: d => selectionFilterPoint===1?1:d.value,
     }):null
   ];
-  const  handlerPolygon=async(event)=>{
+
+  const hanlderAmenities=async()=>{
+    console.log("entro")
+    
+    const multipolygon={
+      geometry:{
+        type : "MultiPolygon",
+        coordinates : 
+          selectPolygon.map((item)=>{            
+            let aa=item.location.coordinates[0].map((item)=>item)
+            aa.push(aa[0])
+            return [aa]
+          })
+        ,
+     /* crs: {
+        type: "name",
+        properties: { name: "urn:x-mongodb:crs:strictwinding:EPSG:4326" }
+     }*/
+      }
+    }
+    //console.log(multipolygon)
+    /*const polygon={
+      geometry:{
+        type : "Polygon",
+        coordinates : [
+          polygonMarker.map((item)=>{//console.log(item)
+            return[item.longitude,item.latitude]})
+      ],
+      crs: {
+        type: "name",
+        properties: { name: "urn:x-mongodb:crs:strictwinding:EPSG:4326" }
+     }
+      }
+    }*/
+   const res = await axios.post('http://localhost:4000/api/data/Amenities', multipolygon);
+    console.log(res.data.Amenity)
+   setdataAmenity(res.data.Amenity);
+
+   setselectionFilterAmenity(1);
+  }
+  const hanndleBuild=async()=>{
+    const multipolygon={
+      geometry:{
+        type : "MultiPolygon",
+        coordinates : 
+          selectPolygon.map((item)=>{            
+            let aa=item.location.coordinates[0].map((item)=>item)
+            aa.push(aa[0])
+            return [aa]
+          })          
+      }
+    } 
+   const res = await axios.post('http://localhost:4000/api/data/Builds', multipolygon);
+    console.log(res.data.Builds)
+  setdataBuild(res.data.Builds)
+  setselectionFilterBuild(1);
+  }
+  const handlerPolygon=async(event)=>{
     //console.log(polygonMarker)
-    polygonMarker.shift()                              
+    //polygonMarker.shift()                              
     polygonMarker.push(polygonMarker[0])
     const polygon={
       geometry:{
@@ -207,7 +266,9 @@ const transformCoordinates=(coordinates)=>{
      }
       }
     }
+    console.log(polygon)
     const res = await axios.post('http://localhost:4000/api/data/polygon', polygon);
+    console.log(res)
     //console.log(res.data.Node)
     //console.log(res.data.Edge)
     //console.log(res.data.Block)
@@ -216,10 +277,11 @@ const transformCoordinates=(coordinates)=>{
     console.log(res.data.Node); 
     setdataEdge(res.data.Edge);
     setdataPolygon(res.data.Block);
-    setdataAmenity(res.data.Amenity);
-    setdataBuild(res.data.Builds);
-    
+    //setdataAmenity(res.data.Amenity);
+ 
+
     setselectionMarked(0);
+    
     setpolygonMarker([])
 
     event.stopPropagation();
@@ -249,6 +311,8 @@ const SubmenuCube=()=>{
   )
 }
   const handleClick = async({ coordinate }) => {
+
+    console.log(coordinate)
     switch(selectionMarked) {
       /* case 1:
          {
@@ -282,12 +346,17 @@ const SubmenuCube=()=>{
          break;
         }
        case 3:
-         {            
+         {      
+           if (coordinate){
+             console.log("entro")
+             console.log(coordinate)
             const coordinateXY={
               longitude:coordinate[0],
               latitude:coordinate[1]      
-            };                
+            };       
+            console.log(coordinateXY)         
             setpolygonMarker([...polygonMarker,coordinateXY]);      
+           }           
                 
          break;}
          case 4:
@@ -313,8 +382,16 @@ const SubmenuCube=()=>{
         layers={layers}
         ContextProvider={MapContext.Provider}        
         onClick={handleClick}
-        >     
+        >  
          <StaticMap  mapStyle={!selectionMap?MAP_STYLE:MAP_STYLE1} mapboxApiAccessToken={MAPBOX_TOKEN} />  
+         {polygonMarker?.map((item)=>{console.log(item)
+            return <Marker latitude={item?.latitude} longitude={item?.longitude} onClick={handlerPolygon}>
+              <i class="uil uil-square-full color__marked"></i>
+            </Marker>}
+          )}                     
+      </DeckGL>
+         
+      <div style={{backgroundColor:"red"}}>
           <div style={{zIndex:1000,cursor:"pointer",position:"absolute",backgroundColor:"#fff",top:200,left:10,border:"1px solid #5e5ef4",borderRadius:"10px",boxShadow:"1px 1px 10px #b9b9b9"}}>
           <div style={{display:'flex',flexDirection:"column"}}>                                
                 <div  onClick={()=>selectionMap===1?setselectionMap(0):setselectionMap(1)} className={`icons__footer color__marked ${selectionMap===1?"color__marked-selected":""}`}><i class={`uil uil-image ${selectionMap===1?"color__marked__icon-selected":""}`}></i></div>       
@@ -379,15 +456,30 @@ const SubmenuCube=()=>{
             </div>    
           </div>           
         </div> 
+        <div style={{zIndex:1000,cursor:"pointer",position:"absolute",backgroundColor:"#fff",top:10,left:120,border:"1px solid #5e5ef4",borderRadius:"10px",boxShadow:"1px 1px 10px #b9b9b9"}}>
+            <div style={{width:"100px",padding:"5px 10px"}}>  
+            <Slider
+          onChange={(nextValues) => {
+            console.log('Change:', nextValues);
+            setvalueSlider(nextValues);
+          }}
+          value={valueSlider}
 
+          min={0}
+          max={255}
+          step={17}
+        />
+            </div>       
+
+        </div> 
         <div style={{zIndex:1000,cursor:"pointer",position:"absolute",backgroundColor:"#fff",top:10,left:10,border:"1px solid #5e5ef4",borderRadius:"10px",boxShadow:"1px 1px 10px #b9b9b9"}}>
             <div style={{display:'flex',flexDirection:"column"}}>  
               
             <div onClick={()=>pointsubmenu?setpointsubmenu(0):setpointsubmenu(1)} className={`icons__footer color__marked ${selectionFilterPoint?"color__marked-selected":""}`}><i className={`uil uil-map-pin ${selectionFilterPoint?"color__marked__icon-selected":""}`}></i></div>                            
             <div onClick={()=>selectionFilterLine?setselectionFilterLine(0):setselectionFilterLine(1)} className={`icons__footer color__marked ${selectionFilterLine?"color__marked-selected":""}`}><i className={`uil uil uil-line-alt ${selectionFilterLine?"color__marked__icon-selected":""}`}></i></div>                            
             <div onClick={()=>cubesubmenu?setcubesubmenu(0):setcubesubmenu(1)} className={`icons__footer color__marked ${selectionFilterPolygon?"color__marked-selected":""}`}><i className={`uil uil-square-full ${selectionFilterPolygon?"color__marked__icon-selected":""}`}></i></div>                 
-            <div onClick={()=>selectionFilterBuild?setselectionFilterBuild(0):setselectionFilterBuild(1)} className={`icons__footer color__marked ${selectionFilterBuild?"color__marked-selected":""}`}><i className={`uil uil-building ${selectionFilterBuild?"color__marked__icon-selected":""}`}></i></div>                 
-            <div onClick={()=>selectionFilterAmenity?setselectionFilterAmenity(0):setselectionFilterAmenity(1)} className={`icons__footer color__marked ${selectionFilterAmenity?"color__marked-selected":""}`}><i className={`uil uil-location-arrow-alt ${selectionFilterAmenity?"color__marked__icon-selected":""}`}></i></div>                 
+            <div onClick={()=>selectionFilterBuild?setselectionFilterBuild(0):hanndleBuild()} className={`icons__footer color__marked ${selectionFilterBuild?"color__marked-selected":""}`}><i className={`uil uil-building ${selectionFilterBuild?"color__marked__icon-selected":""}`}></i></div>                 
+            <div onClick={()=>selectionFilterAmenity?setselectionFilterAmenity(0):hanlderAmenities()} className={`icons__footer color__marked ${selectionFilterAmenity?"color__marked-selected":""}`}><i className={`uil uil-location-arrow-alt ${selectionFilterAmenity?"color__marked__icon-selected":""}`}></i></div>                 
                { /*  
                 <div onClick={()=>selectionFilterPoint?setselectionFilterPoint(0):setselectionFilterPoint(1)} className={`icons__footer color__marked ${selectionFilterPoint?"color__marked-selected":""}`}><i class={`uil uil-map-pin ${selectionFilterPoint?"color__marked__icon-selected":""}`}></i></div>                            
                 <div onClick={()=>selectionFilterLine?setselectionFilterLine(0):setselectionFilterLine(1)} className={`icons__footer color__marked ${selectionFilterLine?"color__marked-selected":""}`}><i class={`uil uil uil-line-alt ${selectionFilterLine?"color__marked__icon-selected":""}`}></i></div>                            
@@ -399,16 +491,14 @@ const SubmenuCube=()=>{
         {pointsubmenu?<SubmenuPoint/>:null}
         {cubesubmenu?<SubmenuCube/>:null}
 
-        {polygonMarker.map((item)=>
-            <Marker latitude={item.latitude} longitude={item.longitude} onClick={handlerPolygon}>
-              <i class="uil uil-square-full color__marked"></i>
-            </Marker>
-          )}                                
-      </DeckGL>
+          
+          </div>
       <Dashboard 
           data={alldata} 
+          dataAmenities={dataAmenity}
           polygon={dataPolygon} 
           state={alldata.length}/> 
+          
           </>)
 }
 export default AppLayer;
