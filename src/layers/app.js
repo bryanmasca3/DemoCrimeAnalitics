@@ -13,7 +13,7 @@ import {useDispatch} from 'react-redux';
 
 import axios from 'axios';
 import {useSelector} from 'react-redux';
-import {selectPointData,selectAmenityData,selectmaxPolygonAmount,selectmaxNodeAmount,setPointData} from "./../redux/slice/Data";
+import {setAmenityDataG,setPointData,selectPointData,selectAmenityData,selectmaxPolygonAmount,selectmaxNodeAmount} from "./../redux/slice/Data";
 
 
 
@@ -27,7 +27,7 @@ const AppLayer=()=> {
 
   const [selectionMap, setselectionMap] = useState(0);
 
-  const [selectionFilterPoint, setselectionFilterPoint] = useState(0);  
+  const [selectionFilterPoint, setselectionFilterPoint] = useState(1);  
   const [selectionFilterLine, setselectionFilterLine] = useState(1);
 
   const [selectionFilterBuild, setselectionFilterBuild] = useState(0);
@@ -59,11 +59,11 @@ const AppLayer=()=> {
   //const [slider, setslider] = useState(255);
  // console.log(datasa)
   //const [dataTest, setdataTest] = useState([]);
-  const [alldata, setalldata] = useState([]);
+  //const [alldata, setalldata] = useState([]);
 
   const [dataEdge, setdataEdge] = useState([]);
   const [dataPolygon, setdataPolygon] = useState([]);
-  const [dataAmenity, setdataAmenity] = useState([]);
+ // const [dataAmenity, setdataAmenity] = useState([]);
   const [dataBuild, setdataBuild] = useState([]);
 
   const [countAllCrimes, setcountAllCrimes] = useState(0);
@@ -108,7 +108,7 @@ const transformCoordinates=(coordinates)=>{
   
  return arrayDataFinal
 }
-  const layers = [
+const layers=[
     selectionFilterBuild?new PolygonLayer({
       id: 'polygon-layer',
      /* data:dataPolygon.filter(item => {const resul=PrePolygonData?.find( dat => dat.key === item.osmid );
@@ -140,23 +140,13 @@ const transformCoordinates=(coordinates)=>{
       elevationScale: selectionFilterPolygon===1?0:10,
       getPolygon: d => transformCoordinates(d.location.coordinates[0]),   
       onClick: (info) => {  
-        info.object.selected=true
-        console.log( info.object)
-        //setslider(50)
+        info.object.selected=true                
         setselectPolygon([...selectPolygon,info.object])},
-      //getElevation: d => selectionFilterPolygon===1?1:d.value,
-      //getFillColor: d => colors[parseInt((d.value*(colors.length-1))/maxPolygonAmount)],
       getElevation: d => Math.floor(Math.random() * (10) ),
-     // getFillColor: d => colors[Math.floor(Math.random() * (10) )],
       updateTriggers: {
-        // This tells deck.gl to recalculate radius when `currentYear` changes
         getFillColor: [selectPolygon,valueSlider]
       },
-      getFillColor: d => {console.log(d)
-      
-        return d.selected ? [100, 105, 155,valueSlider] :  [100, 105, 155]}, //
-      //getFillColor: d => [, 100]    ,
-      //getFillColor: d => {return [253,200,86, 100]},
+      getFillColor: d =>   d.selected ? [100, 105, 155,valueSlider] :  [100, 105, 155], //    
       getLineColor: [255, 255, 255]      
     }):null,
    
@@ -188,12 +178,16 @@ const transformCoordinates=(coordinates)=>{
       radius: 3,
       extruded: true,
       pickable: true,
-      elevationScale: selectionFilterPoint===1?0:3,
+      elevationScale: 1,
       getPosition: d => d.location.coordinates,      
       getFillColor: d => [0,0,0,255],     
-      getElevation: d => selectionFilterPoint===1?1:d.value,
+      getElevation: d => 1,
     }):null
   ];
+
+
+
+ 
 
   const hanlderAmenities=async()=>{
     console.log("entro")
@@ -206,33 +200,13 @@ const transformCoordinates=(coordinates)=>{
             let aa=item.location.coordinates[0].map((item)=>item)
             aa.push(aa[0])
             return [aa]
-          })
-        ,
-     /* crs: {
-        type: "name",
-        properties: { name: "urn:x-mongodb:crs:strictwinding:EPSG:4326" }
-     }*/
+          })    
       }
-    }
-    //console.log(multipolygon)
-    /*const polygon={
-      geometry:{
-        type : "Polygon",
-        coordinates : [
-          polygonMarker.map((item)=>{//console.log(item)
-            return[item.longitude,item.latitude]})
-      ],
-      crs: {
-        type: "name",
-        properties: { name: "urn:x-mongodb:crs:strictwinding:EPSG:4326" }
-     }
-      }
-    }*/
+    } 
    const res = await axios.post('http://localhost:4000/api/data/Amenities', multipolygon);
-    console.log(res.data.Amenity)
-   setdataAmenity(res.data.Amenity);
-
-   setselectionFilterAmenity(1);
+  
+    dispatch(setAmenityDataG(res.data.Amenity));
+    setselectionFilterAmenity(1);
   }
   const hanndleBuild=async()=>{
     const multipolygon={
@@ -247,20 +221,17 @@ const transformCoordinates=(coordinates)=>{
       }
     } 
    const res = await axios.post('http://localhost:4000/api/data/Builds', multipolygon);
-    console.log(res.data.Builds)
   setdataBuild(res.data.Builds)
   setselectionFilterBuild(1);
   }
   const handlerPolygon=async(event)=>{
-    //console.log(polygonMarker)
-    //polygonMarker.shift()                              
+                        
     polygonMarker.push(polygonMarker[0])
     const polygon={
       geometry:{
         type : "Polygon",
         coordinates : [
-          polygonMarker.map((item)=>{//console.log(item)
-            return[item.longitude,item.latitude]})
+          polygonMarker.map((item)=>[item.longitude,item.latitude])
       ],
       crs: {
         type: "name",
@@ -270,21 +241,13 @@ const transformCoordinates=(coordinates)=>{
     }
     const res = await axios.post('http://localhost:4000/api/data/polygon', polygon);
 
-    //console.log(res.data.Node)
-    //console.log(res.data.Edge)
-    //console.log(res.data.Block)
-   // dispatch(setDataFilterd(res.data.Node))      
-    setalldata(res.data.Node);       
-    console.log(res.data.Node); 
+    dispatch(setPointData(res.data.Node));       
+
     setdataEdge(res.data.Edge);
     setdataPolygon(res.data.Block);
     setcountAllCrimes(res.data.count);
-    console.log(res.data.count)
-    //setdataAmenity(res.data.Amenity);
- 
 
-    setselectionMarked(0);
-    
+    setselectionMarked(0);  
     setpolygonMarker([])
 
     event.stopPropagation();
@@ -292,12 +255,12 @@ const transformCoordinates=(coordinates)=>{
   }
 
 const SubmenuPoint=()=>{    
+  console.log(PointData)
     return(
       <div style={{top:10,left:50,zIndex:1,backgroundColor:"#fff",border:"1px solid #5e5ef4",borderRadius:"10px",position:"absolute"}}>
           <div style={{display:'flex',flexDirection:"row"}}>
             <div onClick={()=>selectionFilterPoint===1?setselectionFilterPoint(0):setselectionFilterPoint(1)} className={`icons__footer color__marked ${selectionFilterPoint===1?"color__marked-selected":""}`}> <i class={`"uil uil-elipsis-double-v-alt ${selectionFilterPoint===1?"color__marked__icon-selected":""}`}></i></div>                            
-            <div onClick={()=>selectionFilterPoint===2?setselectionFilterPoint(0):setselectionFilterPoint(2)}  className={`icons__footer color__marked  ${selectionFilterPoint===2?"color__marked-selected":""}`}><i class={`uil uil-graph-bar ${selectionFilterPoint===2?"color__marked__icon-selected":""}`}></i></div>     
-            {/*<div onClick={()=>selectionFilterPoint?setselectionFilterPoint(0):setselectionFilterPoint(1)} className={`icons__footer color__marked ${selectionFilterPoint?"color__marked-selected":""}`}><i class={`uil uil-map-pin ${selectionFilterPoint?"color__marked__icon-selected":""}`}></i></div>*/}                                                  
+            <div onClick={()=>selectionFilterPoint===2?setselectionFilterPoint(0):setselectionFilterPoint(2)}  className={`icons__footer color__marked  ${selectionFilterPoint===2?"color__marked-selected":""}`}><i class={`uil uil-graph-bar ${selectionFilterPoint===2?"color__marked__icon-selected":""}`}></i></div>                 
         </div>
       </div>      
     )
@@ -309,20 +272,32 @@ const LocalValue=()=>Array.from(Array(11).keys()).map((el)=>
 const GlobalValue=()=>Array.from(Array(11).keys()).map((el)=>
   <div className="color-bars">{(el*(countAllCrimes)/11).toFixed(0)} -</div>
 ).reverse()
+const handleResetSelectCube=()=>{
+  setselectPolygon([]);
+  setdataPolygon(dataPolygon.map(({ selected, ...item })=>item));
+  setdataBuild([]);
+  dispatch(setAmenityDataG([])); 
+  setselectionFilterBuild(0);
+  setselectionFilterAmenity(0);
+}
+const handleMenuCube=()=>{
+  setselectionFilterPolygon(0)
+  setcubesubmenu(0)
+}
 const SubmenuCube=()=>{
   
   return(
     <div style={{top:80,left:50,zIndex:1,backgroundColor:"#fff",border:"1px solid #5e5ef4",borderRadius:"10px",position:"absolute"}}>
         <div style={{display:'flex',flexDirection:"row"}}>             
-          <div onClick={()=>selectionFilterPolygon===1?setselectionFilterPolygon(0):setselectionFilterPolygon(1)} className={`icons__footer color__marked  ${selectionFilterPolygon===1?"color__marked-selected":""}`}><i class={`"uil uil-square-full  ${selectionFilterPolygon===1?"color__marked__icon-selected":""}`}></i> </div> 
-          <div onClick={()=>selectionFilterPolygon===2?setselectionFilterPolygon(0):setselectionFilterPolygon(2)} className={`icons__footer color__marked  ${selectionFilterPolygon===2?"color__marked-selected":""}`}> <i class={`"uil uil-cube ${selectionFilterPolygon===2?"color__marked__icon-selected":""}`}></i>   </div>                                      
+          <div onClick={()=>selectionFilterPolygon===1?handleMenuCube():setselectionFilterPolygon(1)} className={`icons__footer color__marked  ${selectionFilterPolygon===1?"color__marked-selected":""}`}><i class={`"uil uil-square-full  ${selectionFilterPolygon===1?"color__marked__icon-selected":""}`}></i> </div> 
+          <div onClick={()=>selectionFilterPolygon===2?handleMenuCube():setselectionFilterPolygon(2)} className={`icons__footer color__marked  ${selectionFilterPolygon===2?"color__marked-selected":""}`}> <i class={`"uil uil-cube ${selectionFilterPolygon===2?"color__marked__icon-selected":""}`}></i>   </div>                                      
+          <div onClick={()=>selectPolygon.length?handleResetSelectCube():null} className={`icons__footer color__marked `}> <i class={`uil-trash`}></i></div>                                      
       </div>
     </div>      
   )
 }
   const handleClick = async({ coordinate }) => {
 
-    console.log(coordinate)
     switch(selectionMarked) {
       /* case 1:
          {
@@ -335,7 +310,7 @@ const SubmenuCube=()=>{
          break;}*/
        case 2:
          {               
-           if(!stateCircle){
+         /*  if(!stateCircle){
             stateCircle=!stateCircle;
            }else{
               const coordinateXY={
@@ -353,30 +328,26 @@ const SubmenuCube=()=>{
             setselectionMarked(0);   
            }
                         
-         break;
+         break;*/
         }
        case 3:
          {      
-           if (coordinate){
-             console.log("entro")
-             console.log(coordinate)
+           if (coordinate){        
             const coordinateXY={
               longitude:coordinate[0],
               latitude:coordinate[1]      
-            };       
-            console.log(coordinateXY)         
+            };                  
             setpolygonMarker([...polygonMarker,coordinateXY]);      
            }           
                 
          break;}
          case 4:
-             {               
-              //dispatch(setDataFilterd([])) 
-              setalldata([]);
+             {                             
+              dispatch(setPointData([]));
               setdataEdge([]);  
               setdataPolygon([]); 
               setdataBuild([]); 
-              setdataAmenity([]); 
+              dispatch(setAmenityDataG([])); 
              break;}
        default:
          {       
@@ -394,7 +365,7 @@ const SubmenuCube=()=>{
         onClick={handleClick}
         >  
          <StaticMap  mapStyle={!selectionMap?MAP_STYLE:MAP_STYLE1} mapboxApiAccessToken={MAPBOX_TOKEN} />  
-         {polygonMarker?.map((item)=>{console.log(item)
+         {polygonMarker?.map((item)=>{
             return <Marker latitude={item?.latitude} longitude={item?.longitude} onClick={handlerPolygon}>
               <i class="uil uil-square-full color__marked"></i>
             </Marker>}
@@ -422,36 +393,14 @@ const SubmenuCube=()=>{
             <div className="color-bars">Local </div>  
           </div>
           <div style={{display:'flex',gap:'0.2rem'}}>
-            <div style={{display:'flex',flexDirection:"column",justifyContent:"space-between"}}>                                        
-               {/* <div className="color-bars">550 -</div>                            
-                <div className="color-bars">500 -</div>     
-                <div className="color-bars">450 -</div>                            
-                <div className="color-bars">400 -</div>                            
-                <div className="color-bars">350 -</div>   
-                <div className="color-bars">300 -</div>                            
-                <div className="color-bars">250 -</div>                            
-                <div className="color-bars">200 -</div>   
-                <div className="color-bars">150 -</div>                            
-                <div className="color-bars">100 -</div> 
-         <div className="color-bars">50 -</div> */}
-         {<GlobalValue/>}
+            <div style={{display:'flex',flexDirection:"column",justifyContent:"space-between"}}>                                            
+                {<GlobalValue/>}
             </div>
             <div style={{display:'flex',flexDirection:"column"}}>                
                 <div className="color-bars with" style={{"background-color":"#e5e5e5"}}></div>                                                                                                             
             </div>     
             <div style={{display:'flex',flexDirection:"column",justifyContent:"space-between"}}>   
-                     {<LocalValue/>}
-               {/* <div className="color-bars">{maxNodeAmount} -</div>                            
-                <div className="color-bars">100 -</div>     
-                <div className="color-bars">90 -</div>                            
-                <div className="color-bars">80 -</div>                            
-                <div className="color-bars">70 -</div>   
-                <div className="color-bars">60 -</div>                            
-                <div className="color-bars">50 -</div>                            
-                <div className="color-bars">40 -</div>   
-                <div className="color-bars">30 -</div>                            
-                <div className="color-bars">20 -</div> 
-         <div className="color-bars">10 -</div> */}
+                {<LocalValue/>}         
             </div>
             <div style={{display:'flex',flexDirection:"column" ,justifyContent:"space-between"}}>                
                 <div className="color-bars" style={{"background-color":colorsrgba[10]}}></div>                            
@@ -469,19 +418,21 @@ const SubmenuCube=()=>{
           </div>           
         </div> 
         <div style={{zIndex:1000,cursor:"pointer",position:"absolute",backgroundColor:"#fff",top:10,left:120,border:"1px solid #5e5ef4",borderRadius:"10px",boxShadow:"1px 1px 10px #b9b9b9"}}>
-            <div style={{width:"100px",padding:"5px 10px"}}>  
-            <Slider
-          onChange={(nextValues) => {
-            console.log('Change:', nextValues);
-            setvalueSlider(nextValues);
-          }}
-          value={valueSlider}
+              
+            {selectionFilterPolygon&&selectPolygon.length?
+            <div style={{width:"100px",padding:"5px 10px"}}>
+              <Slider
+                onChange={(nextValues) => {
+                  console.log('Change:', nextValues);
+                  setvalueSlider(nextValues);
+                }}
+                value={valueSlider}
 
-          min={0}
-          max={255}
-          step={17}
-        />
-            </div>       
+                min={0}
+                max={255}
+                step={17}
+              /><p style={{fontSize:"0.7rem", margin:"0"}}>{selectPolygon.length+" bl. seleccionados"}</p></div>:null}
+                  
 
         </div> 
         <div style={{zIndex:1000,cursor:"pointer",position:"absolute",backgroundColor:"#fff",top:10,left:10,border:"1px solid #5e5ef4",borderRadius:"10px",boxShadow:"1px 1px 10px #b9b9b9"}}>
@@ -501,17 +452,14 @@ const SubmenuCube=()=>{
 
         </div> 
         {pointsubmenu?<SubmenuPoint/>:null}
-        {cubesubmenu?<SubmenuCube/>:null}
-
-          
+        {cubesubmenu?<SubmenuCube/>:null}          
           </div>
       <Dashboard 
-          data={alldata} 
-          dataAmenities={dataAmenity}
+          data={PointData} 
+          dataAmenities={AmenityData}
           polygon={dataPolygon} 
-          state={alldata.length}
-          stateAmenities={dataAmenity.length}/> 
-          
+          state={PointData.length}
+          stateAmenities={AmenityData.length}/>           
           </>)
 }
 export default AppLayer;

@@ -37,21 +37,6 @@ const MoveChartFunc = (divRef, ndx,dispatch,dimPoly,dimNode) => {
     .on("filtered", async function() {
  
       var result = [];
-      //var result2 = [];
-     // console.log(datasetpolygon);
-     /* var subsetGroup=dimPoly.top(Infinity).reduce(function(a, b) {
-        var c=b["idpolygons"].map((item)=>{return{"key":item,"value":1}})        
-        return a.concat(c);
-      }, []);
-      
-      subsetGroup.reduce(function(res,b){
-        if (!res[b.key]) {
-          res[b.key] = { "key": b.key, "value": 0};
-          result2.push(res[b.key])
-        }
-        res[b.key].value += b.value;
-        return res;
-      },{});*/
 
       dimNode.top(Infinity).reduce(function(res, b) {
        console.log(res[b["location"].coordinates])
@@ -64,18 +49,10 @@ const MoveChartFunc = (divRef, ndx,dispatch,dimPoly,dimNode) => {
       }, {});
       
       const MaxPoint          = max(result, (f)=> f.value )  
-     // const MaxPolygon          = max(result2, (f)=> f.value )  
 
-     // console.log(times.top(Infinity))
-      
       dispatch(setmaxNodeAmount(MaxPoint))
-     // dispatch(setmaxPolygonAmount(MaxPolygon?MaxPolygon+2:1))
       dispatch(setPointData(result))
-      //dispatch(setPrePolygonData(datasetpolygon))
-      //dispatch(setPrePolygonData(result2))
-      
-      //console.log(dimNode.group().all())
-      //dispatch(setPointData(dimNode.group().all()))
+
   })     
     .clipPadding(10)     
     .dimension(dimTime)      

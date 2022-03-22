@@ -2,7 +2,7 @@ import React from "react";
 import * as crossfilter from "crossfilter2/crossfilter";
 import {timeFormat,timeParse,format} from 'd3'
 import "dc/dc.css";
-
+import {setmaxPolygonAmount,setmaxNodeAmount,setPointData,setPrePolygonData} from "./../redux/slice/Data";
 export const CXContext = React.createContext("CXContext");
 export const  dateFormatSpecifier = '%m/%d/%Y';
 

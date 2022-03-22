@@ -6,7 +6,6 @@ import BarchartAmenitiesView from "./barchartAmenitiesView";
 import './../App.css';
 
  const Dashboard = ({data,state,polygon,dataAmenities,stateAmenities})=>{    
-
     return (
       <>
            <div style={{zIndex:1000,cursor:"pointer",position:"absolute",backgroundColor:"#fff",bottom:10,right:10,border:"1px solid #5e5ef4",borderRadius:"10px",boxShadow:"1px 1px 10px #b9b9b9"}}>                    
