@@ -7,6 +7,7 @@ const initialState = {
   CrimeData:0,
   maxPolygonAmount:0,
   maxNodeAmount:0,
+  AmenityData:0
 }
 
 export const byDataFilteredSlice = createSlice({
@@ -30,12 +31,15 @@ export const byDataFilteredSlice = createSlice({
     },
     setmaxNodeAmount: (state, action) => {
       state.maxNodeAmount = action.payload
-    }
+    },
+    setAmenityDataG: (state, action) => {
+      state.AmenityData = action.payload
+    },
 
   },
 })
 
-export const {setmaxPolygonAmount,setmaxNodeAmount,setPointData,setPolygonData,setCrimeData,setPrePolygonData} = byDataFilteredSlice.actions;
+export const {setAmenityDataG,setmaxPolygonAmount,setmaxNodeAmount,setPointData,setPolygonData,setCrimeData,setPrePolygonData} = byDataFilteredSlice.actions;
 
 //export const selectDataFiltered = (state)=>state.dataFilteredSlice.dataFiltered;
 
@@ -45,5 +49,6 @@ export const selectCrimeData = (state)=>state.dataFilteredSlice.CrimeData;
 export const selectPrePolygonData = (state)=>state.dataFilteredSlice.PrePolygonData;
 export const selectmaxPolygonAmount = (state)=>state.dataFilteredSlice.maxPolygonAmount;
 export const selectmaxNodeAmount = (state)=>state.dataFilteredSlice.maxNodeAmount;
+export const selectAmenityData = (state)=>state.dataFilteredSlice.AmenityData;
 
 export default byDataFilteredSlice.reducer

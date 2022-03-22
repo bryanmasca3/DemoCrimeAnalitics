@@ -5,7 +5,7 @@ import { ChartTemplate } from "./chartTemplate";
 import './../App.css';
 import {setmaxPolygonAmount,setmaxNodeAmount,setPointData,setPrePolygonData} from "./../redux/slice/Data";
 
-const MoveChartFunc = (divRef, ndx,dispatch,dimPoly,dimNode,datasetpolygon) => {  
+const MoveChartFunc = (divRef, ndx,dispatch,dimPoly,dimNode) => {  
 
  
 
@@ -54,6 +54,7 @@ const MoveChartFunc = (divRef, ndx,dispatch,dimPoly,dimNode,datasetpolygon) => {
       },{});*/
 
       dimNode.top(Infinity).reduce(function(res, b) {
+       console.log(res[b["location"].coordinates])
         if (!res[b["location"].coordinates]) {
           res[b["location"].coordinates] = { "key": b["location"].coordinates, "value": 0 };
           result.push(res[b["location"].coordinates])
@@ -65,7 +66,8 @@ const MoveChartFunc = (divRef, ndx,dispatch,dimPoly,dimNode,datasetpolygon) => {
       const MaxPoint          = max(result, (f)=> f.value )  
      // const MaxPolygon          = max(result2, (f)=> f.value )  
 
-
+     // console.log(times.top(Infinity))
+      
       dispatch(setmaxNodeAmount(MaxPoint))
      // dispatch(setmaxPolygonAmount(MaxPolygon?MaxPolygon+2:1))
       dispatch(setPointData(result))
@@ -98,7 +100,7 @@ export const TemporalView = ({datasetpolygon})  => {
   return(<>
     <div className="button__temp-view" onClick={()=>setisShowTempView(!isShowTempView)}><i class="uil uil-chart-line"></i> </div>        
     <div className={`temporal__view ${isShowTempView?"temporal__view-show":"temporal__view-close"}` }>      
-            <ChartTemplate chartFunction={MoveChartFunc} title="Monthly Price Moves" datasetpolygon={datasetpolygon}/>        
+            <ChartTemplate chartFunction={MoveChartFunc} title="Monthly Price Moves"/>        
       </div>
       </>
       

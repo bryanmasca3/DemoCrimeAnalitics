@@ -4,7 +4,7 @@ import {max,scaleLinear} from "d3";
 import { ChartTemplate } from "./chartTemplate";
 import {setmaxPolygonAmount,setmaxNodeAmount,setPointData,setPrePolygonData} from "./../redux/slice/Data";
 import './../App.css';
-const dayOfWeekFunc = (divRef, ndx,dispatch,dimPoly,dimNode,datasetpolygon) => {
+const dayOfWeekFunc = (divRef, ndx,dispatch,dimPoly,dimNode) => {
     
     const dayOfWeekChart = dc.rowChart(divRef)
     //data.map(a=>a.atribute.map(item=>dataParse.push({"date":item.Fecha})))
@@ -74,7 +74,7 @@ export const ChartView = ({datasetpolygon}) =>{
      <div className="button__histogram-view" onClick={()=>setisHistogramView(!isHistogramView)}><i class="uil uil-chart-bar"></i></div>
         <div className={`histogram__view ${isHistogramView?"histogram__view-show":"histogram__view-close"}` }>
            
-            <ChartTemplate chartFunction={dayOfWeekFunc} title="Weekday" datasetpolygon={datasetpolygon}/>    
+            <ChartTemplate chartFunction={dayOfWeekFunc} title="Weekday"/>    
         </div>  
         </>                        
     )

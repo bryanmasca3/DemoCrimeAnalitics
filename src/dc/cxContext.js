@@ -1,5 +1,5 @@
 import React from "react";
-import * as crossfilter from "crossfilter2";
+import * as crossfilter from "crossfilter2/crossfilter";
 import {timeFormat,timeParse,format} from 'd3'
 import "dc/dc.css";
 

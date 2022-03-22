@@ -5,7 +5,7 @@ import { ChartView} from "./barchartView";
 import BarchartAmenitiesView from "./barchartAmenitiesView";
 import './../App.css';
 
- const Dashboard = ({data,state,polygon,dataAmenities})=>{    
+ const Dashboard = ({data,state,polygon,dataAmenities,stateAmenities})=>{    
 
     return (
       <>
@@ -14,8 +14,14 @@ import './../App.css';
           {state&&<DataContext 
                 dataset={data} > 
               <TemporalView datasetpolygon={polygon}/>
-              <ChartView datasetpolygon={polygon}/>
-              <BarchartAmenitiesView/></DataContext>}
+              <ChartView datasetpolygon={polygon}/></DataContext>
+              }
+              {stateAmenities&&
+                <DataContext 
+                dataset={dataAmenities} > <BarchartAmenitiesView
+                datasetAmenities={dataAmenities}
+                /></DataContext>
+              }
       </>
     );
 }

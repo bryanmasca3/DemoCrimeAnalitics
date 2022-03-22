@@ -56,7 +56,7 @@ export const ChartTemplate = props => {
   /*DATA*/
   React.useEffect(() => {   
     //console.log(props.datasetpolygon)
-    const newChart = props.chartFunction(div.current, ndx,dispatch,dimPoly,dimNode,props.datasetpolygon);     
+    const newChart = props.chartFunction(div.current, ndx,dispatch,dimPoly,dimNode);     
     newChart.render();
     updateChart(newChart);
   },[]);

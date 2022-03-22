@@ -13,7 +13,7 @@ import {useDispatch} from 'react-redux';
 
 import axios from 'axios';
 import {useSelector} from 'react-redux';
-import {selectPointData,selectmaxPolygonAmount,selectmaxNodeAmount} from "./../redux/slice/Data";
+import {selectPointData,selectAmenityData,selectmaxPolygonAmount,selectmaxNodeAmount,setPointData} from "./../redux/slice/Data";
 
 
 
@@ -41,6 +41,7 @@ const AppLayer=()=> {
   const [cubesubmenu, setcubesubmenu] = useState(0);
 
   const PointData = useSelector(selectPointData);
+  const AmenityData=useSelector(selectAmenityData);
  // const PolygonData = useSelector(selectPrePolygonData);
   const maxPolygonAmount = useSelector(selectmaxPolygonAmount);
   const maxNodeAmount = useSelector(selectmaxNodeAmount);
@@ -65,6 +66,7 @@ const AppLayer=()=> {
   const [dataAmenity, setdataAmenity] = useState([]);
   const [dataBuild, setdataBuild] = useState([]);
 
+  const [countAllCrimes, setcountAllCrimes] = useState(0);
   const [selectPolygon, setselectPolygon] = useState([]);
 const colors=[[255,255,255,255],[251,255,210,255],[254,244,186,255],[255,238,164,255],[255,224,138,255],[252,218,123,255],[253,200,86,255],[251,120,74,255],[255,93,60,255],[255,63,63,255],[252,44,44,255]]
 const colorsrgba=["#f8f8f8","#fbffd2","#fef4ba","#ffeea4","#ffe08a","#fcda7b","#fdc856","#fb784a","#ff5d3c","#ff3f3f","#fc2c2c"]
@@ -181,7 +183,7 @@ const transformCoordinates=(coordinates)=>{
     }):null,
     selectionFilterAmenity?new ColumnLayer({
       id: 'column-layer',
-      data: dataAmenity,
+      data: AmenityData,
       diskResolution: 5,
       radius: 3,
       extruded: true,
@@ -266,9 +268,8 @@ const transformCoordinates=(coordinates)=>{
      }
       }
     }
-    console.log(polygon)
     const res = await axios.post('http://localhost:4000/api/data/polygon', polygon);
-    console.log(res)
+
     //console.log(res.data.Node)
     //console.log(res.data.Edge)
     //console.log(res.data.Block)
@@ -277,6 +278,8 @@ const transformCoordinates=(coordinates)=>{
     console.log(res.data.Node); 
     setdataEdge(res.data.Edge);
     setdataPolygon(res.data.Block);
+    setcountAllCrimes(res.data.count);
+    console.log(res.data.count)
     //setdataAmenity(res.data.Amenity);
  
 
@@ -299,6 +302,13 @@ const SubmenuPoint=()=>{
       </div>      
     )
 }
+const LocalValue=()=>Array.from(Array(11).keys()).map((el)=>
+  <div className="color-bars">{(el*(maxNodeAmount)/11).toFixed(2)} -</div>
+).reverse()
+
+const GlobalValue=()=>Array.from(Array(11).keys()).map((el)=>
+  <div className="color-bars">{(el*(countAllCrimes)/11).toFixed(0)} -</div>
+).reverse()
 const SubmenuCube=()=>{
   
   return(
@@ -406,14 +416,14 @@ const SubmenuCube=()=>{
                 <div onClick={()=>selectionMarked===4?setselectionMarked(0):setselectionMarked(4)} className={`icons__footer color__marked ${selectionMarked===4?"color__marked-selected":""}`}><i class={`uil uil-trash-alt ${selectionMarked===4?"color__marked__icon-selected":""}`}></i></div>       
             </div>       
         </div>  
-        <div style={{zIndex:1000,cursor:"pointer",position:"absolute",backgroundColor:"#fff",top:300,left:10,boxShadow:"1px 1px 10px #b9b9b9",fontSize:"0.65rem",padding:"10px 0px"}}>
+        <div style={{zIndex:1000,cursor:"pointer",position:"absolute",backgroundColor:"#fff",top:300,left:10,boxShadow:"1px 1px 10px #b9b9b9",fontSize:"0.65rem",padding:"10px 5px"}}>
           <div style={{display:'flex',justifyContent:"space-around",fontWeight:"600",padding:"2px 0px"}}>
             <div className="color-bars">Global</div>                            
-            <div className="color-bars">Local</div>  
+            <div className="color-bars">Local </div>  
           </div>
-          <div style={{display:'flex'}}>
+          <div style={{display:'flex',gap:'0.2rem'}}>
             <div style={{display:'flex',flexDirection:"column",justifyContent:"space-between"}}>                                        
-                <div className="color-bars">550 -</div>                            
+               {/* <div className="color-bars">550 -</div>                            
                 <div className="color-bars">500 -</div>     
                 <div className="color-bars">450 -</div>                            
                 <div className="color-bars">400 -</div>                            
@@ -423,13 +433,15 @@ const SubmenuCube=()=>{
                 <div className="color-bars">200 -</div>   
                 <div className="color-bars">150 -</div>                            
                 <div className="color-bars">100 -</div> 
-                <div className="color-bars">50 -</div> 
+         <div className="color-bars">50 -</div> */}
+         {<GlobalValue/>}
             </div>
             <div style={{display:'flex',flexDirection:"column"}}>                
                 <div className="color-bars with" style={{"background-color":"#e5e5e5"}}></div>                                                                                                             
             </div>     
-            <div style={{display:'flex',flexDirection:"column",justifyContent:"space-between"}}>              
-                <div className="color-bars">110 -</div>                            
+            <div style={{display:'flex',flexDirection:"column",justifyContent:"space-between"}}>   
+                     {<LocalValue/>}
+               {/* <div className="color-bars">{maxNodeAmount} -</div>                            
                 <div className="color-bars">100 -</div>     
                 <div className="color-bars">90 -</div>                            
                 <div className="color-bars">80 -</div>                            
@@ -439,7 +451,7 @@ const SubmenuCube=()=>{
                 <div className="color-bars">40 -</div>   
                 <div className="color-bars">30 -</div>                            
                 <div className="color-bars">20 -</div> 
-                <div className="color-bars">10 -</div> 
+         <div className="color-bars">10 -</div> */}
             </div>
             <div style={{display:'flex',flexDirection:"column" ,justifyContent:"space-between"}}>                
                 <div className="color-bars" style={{"background-color":colorsrgba[10]}}></div>                            
@@ -497,7 +509,8 @@ const SubmenuCube=()=>{
           data={alldata} 
           dataAmenities={dataAmenity}
           polygon={dataPolygon} 
-          state={alldata.length}/> 
+          state={alldata.length}
+          stateAmenities={dataAmenity.length}/> 
           
           </>)
 }
