@@ -10,7 +10,7 @@ import {ColumnLayer,LineLayer,PolygonLayer} from '@deck.gl/layers';
 //import {lineLayerCustom} from "./lineLayer";
 import Dashboard from "./../dc/dashboard";
 import {useDispatch} from 'react-redux';
-
+import Swal from "sweetalert2";
 import axios from 'axios';
 import {useSelector} from 'react-redux';
 import {setAmenityDataG,setPointData,selectPointData,selectAmenityData,selectmaxPolygonAmount,selectmaxNodeAmount} from "./../redux/slice/Data";
@@ -109,6 +109,18 @@ const transformCoordinates=(coordinates)=>{
  return arrayDataFinal
 }
 const layers=[
+  selectionFilterPoint?new ColumnLayer({
+    id: 'column-layer',
+    data: PointData,
+    diskResolution: 5,
+    radius: 3,
+    extruded: true,
+    pickable: true,
+    elevationScale: selectionFilterPoint===1?0:3,
+    getPosition: d => d.key,      
+    getFillColor: d => colors[parseInt((d.value*(colors.length-1))/maxNodeAmount)],     
+    getElevation: d => selectionFilterPoint===1?1:d.value,
+  }):null,  
     selectionFilterBuild?new PolygonLayer({
       id: 'polygon-layer',
      /* data:dataPolygon.filter(item => {const resul=PrePolygonData?.find( dat => dat.key === item.osmid );
@@ -126,6 +138,18 @@ const layers=[
       getFillColor: d => [0,255,0,100], 
       getLineColor: [255, 255, 255]      
     }):null,
+  selectionFilterAmenity?new ColumnLayer({
+    id: 'column-layer',
+    data: AmenityData,
+    diskResolution: 5,
+    radius: 3,
+    extruded: true,
+    pickable: true,
+    elevationScale: 1,
+    getPosition: d => d.location.coordinates,      
+    getFillColor: d => [0,0,0,255],     
+    getElevation: d => 1,
+  }):null,
     selectionFilterPolygon?new PolygonLayer({
       id: 'polygon-layer',
      /* data:dataPolygon.filter(item => {const resul=PrePolygonData?.find( dat => dat.key === item.osmid );
@@ -139,9 +163,24 @@ const layers=[
       extruded:true,      
       elevationScale: selectionFilterPolygon===1?0:10,
       getPolygon: d => transformCoordinates(d.location.coordinates[0]),   
-      onClick: (info) => {  
-        info.object.selected=true                
-        setselectPolygon([...selectPolygon,info.object])},
+      onClick: (info) => {
+        if(selectionFilterAmenity||selectionFilterBuild){
+          Swal.fire({
+            position: "center",
+            type: "warning",
+            text: "Primero desactiva la opción Amenity o Build",
+            showConfirmButton: false,
+            timer: 1500,
+          });
+        }else{
+          info.object.selected=info.object?.selected?false:true   
+          if(info.object.selected){
+            setselectPolygon([...selectPolygon,info.object])
+          }else{
+            setselectPolygon(selectPolygon.filter((item)=>item.osmid!=info.object.osmid))          
+          }
+        }
+       },
       getElevation: d => Math.floor(Math.random() * (10) ),
       updateTriggers: {
         getFillColor: [selectPolygon,valueSlider]
@@ -149,7 +188,6 @@ const layers=[
       getFillColor: d =>   d.selected ? [100, 105, 155,valueSlider] :  [100, 105, 155], //    
       getLineColor: [255, 255, 255]      
     }):null,
-   
     selectionFilterLine?new LineLayer({
       id: 'line-layer',
       data: dataEdge,
@@ -158,30 +196,6 @@ const layers=[
       getSourcePosition: d => d.location.coordinates[0],
       getTargetPosition: d => d.location.coordinates[1],
       getColor: d =>  [207, 153, 81]
-    }):null,
-    selectionFilterPoint?new ColumnLayer({
-      id: 'column-layer',
-      data: PointData,
-      diskResolution: 5,
-      radius: 3,
-      extruded: true,
-      pickable: true,
-      elevationScale: selectionFilterPoint===1?0:3,
-      getPosition: d => d.key,      
-      getFillColor: d => colors[parseInt((d.value*(colors.length-1))/maxNodeAmount)],     
-      getElevation: d => selectionFilterPoint===1?1:d.value,
-    }):null,
-    selectionFilterAmenity?new ColumnLayer({
-      id: 'column-layer',
-      data: AmenityData,
-      diskResolution: 5,
-      radius: 3,
-      extruded: true,
-      pickable: true,
-      elevationScale: 1,
-      getPosition: d => d.location.coordinates,      
-      getFillColor: d => [0,0,0,255],     
-      getElevation: d => 1,
     }):null
   ];
 
@@ -190,8 +204,8 @@ const layers=[
  
 
   const hanlderAmenities=async()=>{
-    console.log("entro")
-    
+     
+   if(selectPolygon.length){
     const multipolygon={
       geometry:{
         type : "MultiPolygon",
@@ -207,22 +221,43 @@ const layers=[
   
     dispatch(setAmenityDataG(res.data.Amenity));
     setselectionFilterAmenity(1);
+   }else{
+    Swal.fire({
+      position: "center",
+      type: 'info',
+      text: "No hay Blocks seleccionados",
+      showConfirmButton: false,
+      timer: 1500
+    })
+   }
   }
+
   const hanndleBuild=async()=>{
-    const multipolygon={
-      geometry:{
-        type : "MultiPolygon",
-        coordinates : 
-          selectPolygon.map((item)=>{            
-            let aa=item.location.coordinates[0].map((item)=>item)
-            aa.push(aa[0])
-            return [aa]
-          })          
-      }
-    } 
-   const res = await axios.post('http://localhost:4000/api/data/Builds', multipolygon);
-  setdataBuild(res.data.Builds)
-  setselectionFilterBuild(1);
+    if(selectPolygon.length){
+      const multipolygon={
+        geometry:{
+          type : "MultiPolygon",
+          coordinates : 
+            selectPolygon.map((item)=>{            
+              let aa=item.location.coordinates[0].map((item)=>item)
+              aa.push(aa[0])
+              return [aa]
+            })          
+        }
+      } 
+     const res = await axios.post('http://localhost:4000/api/data/Builds', multipolygon);
+    setdataBuild(res.data.Builds)
+    setselectionFilterBuild(1);
+    }else{
+      Swal.fire({
+        position: "center",
+        type: 'info',
+        text: "No hay Blocks seleccionados",
+        showConfirmButton: false,
+        timer: 1500
+      })
+    }
+   
   }
   const handlerPolygon=async(event)=>{
                         
@@ -273,12 +308,34 @@ const GlobalValue=()=>Array.from(Array(11).keys()).map((el)=>
   <div className="color-bars">{(el*(countAllCrimes)/11).toFixed(0)} -</div>
 ).reverse()
 const handleResetSelectCube=()=>{
-  setselectPolygon([]);
-  setdataPolygon(dataPolygon.map(({ selected, ...item })=>item));
-  setdataBuild([]);
-  dispatch(setAmenityDataG([])); 
-  setselectionFilterBuild(0);
-  setselectionFilterAmenity(0);
+  try {
+  Swal.fire({
+    title: "¿Deseas eliminar la selección?",
+    confirmButtonText: "Aceptar",
+    showCancelButton: true,
+    text:"Esto eliminará los Blocks seleccionados, Amenities y Buildings."
+  }).then(async (result) => {
+    if (result.value) {
+      console.log("que pasoooooooooooo")
+      console.log(result.isConfirmed) 
+      setselectPolygon([]);
+      setdataPolygon(dataPolygon.map(({ selected, ...item })=>item));
+      setdataBuild([]);
+      dispatch(setAmenityDataG([])); 
+      setselectionFilterBuild(0);
+      setselectionFilterAmenity(0);
+        
+    }
+  });
+  } catch (e) {   
+    Swal.fire({
+      position: "center",
+      type: "error",
+      title: "Error al Eliminar",
+      showConfirmButton: false,
+      timer: 1500,
+    });
+  }
 }
 const handleMenuCube=()=>{
   setselectionFilterPolygon(0)
