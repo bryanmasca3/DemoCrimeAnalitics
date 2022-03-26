@@ -5,7 +5,7 @@ import DeckGL from 'deck.gl';
 import 'rc-slider/assets/index.css';
 import {MAPBOX_TOKEN,MAP_STYLE,MAP_STYLE1}from "./../constants/variables";
 import Slider from 'rc-slider';
-import {ColumnLayer,LineLayer,PolygonLayer} from '@deck.gl/layers';
+import {IconLayer,ColumnLayer,LineLayer,PolygonLayer} from '@deck.gl/layers';
 //import {columnLayerCustom} from "./columnLayer";
 //import {lineLayerCustom} from "./lineLayer";
 import Dashboard from "./../dc/dashboard";
@@ -67,9 +67,22 @@ const AppLayer=()=> {
   const [dataBuild, setdataBuild] = useState([]);
 
   const [countAllCrimes, setcountAllCrimes] = useState(0);
+  const ICON_MAPPING = {
+    marker: {x: 0, y: 0, width: 96, height: 96, mask: true}
+  };
   const [selectPolygon, setselectPolygon] = useState([]);
 const colors=[[255,255,255,255],[251,255,210,255],[254,244,186,255],[255,238,164,255],[255,224,138,255],[252,218,123,255],[253,200,86,255],[251,120,74,255],[255,93,60,255],[255,63,63,255],[252,44,44,255]]
 const colorsrgba=["#f8f8f8","#fbffd2","#fef4ba","#ffeea4","#ffe08a","#fcda7b","#fdc856","#fb784a","#ff5d3c","#ff3f3f","#fc2c2c"]
+const AmenitiesIcon=[{              
+              type:"other",
+              url:"https://img.icons8.com/color/96/000000/error--v1.png"
+            },{              
+              type:"restaurant",
+              url:"https://img.icons8.com/color/96/000000/food.png"
+            },{              
+              type:"fast_food",
+              url:"https://img.icons8.com/color/96/000000/refreshments.png"
+            }];
 const transformCoordinates=(coordinates)=>{
 
   let arrayData=[]
@@ -138,7 +151,7 @@ const layers=[
       getFillColor: d => [0,255,0,100], 
       getLineColor: [255, 255, 255]      
     }):null,
-  selectionFilterAmenity?new ColumnLayer({
+ /* selectionFilterAmenity?new ColumnLayer({
     id: 'column-layer',
     data: AmenityData,
     diskResolution: 5,
@@ -149,6 +162,32 @@ const layers=[
     getPosition: d => d.location.coordinates,      
     getFillColor: d => [0,0,0,255],     
     getElevation: d => 1,
+  }):null,*/
+  selectionFilterAmenity?new IconLayer({
+    id: 'icon-layer',
+    data:AmenityData,
+    pickable: false,
+    // iconAtlas and iconMapping are required
+    // getIcon: return a string
+    //iconAtlas: 'https://img.icons8.com/color/96/000000/food.png',
+    iconAtlas: 'img/icons.png',
+    /*iconAtlas: d=>{
+      console.log(d)
+      const idx=AmenitiesIcon.findIndex(item=>item.type===d.Amenity)!=-1     
+      console.log(idx) 
+      if(idx!==-1){
+       return AmenitiesIcon[idx].url        
+      }else{
+        return AmenitiesIcon[0].url
+      }
+    },*/ 
+    iconMapping: ICON_MAPPING,    
+    getIcon: d => 'marker',
+
+    sizeScale: 5,
+    getPosition: d => d.location.coordinates,
+    getSize: d => 4,
+    getColor: d => [252, 140, 0]
   }):null,
     selectionFilterPolygon?new PolygonLayer({
       id: 'polygon-layer',
@@ -218,7 +257,7 @@ const layers=[
       }
     } 
    const res = await axios.post('http://localhost:4000/api/data/Amenities', multipolygon);
-  
+    console.log(res.data.Amenity)
     dispatch(setAmenityDataG(res.data.Amenity));
     setselectionFilterAmenity(1);
    }else{
@@ -353,6 +392,16 @@ const SubmenuCube=()=>{
     </div>      
   )
 }
+const handleRemoveAll=()=>{
+        
+    //console.log("TRASH")               
+     dispatch(setPointData([]));
+     setdataEdge([]);  
+     setdataPolygon([]); 
+     setdataBuild([]); 
+     dispatch(setAmenityDataG([])); 
+  
+}
   const handleClick = async({ coordinate }) => {
 
     switch(selectionMarked) {
@@ -386,6 +435,7 @@ const SubmenuCube=()=>{
            }
                         
          break;*/
+         break;
         }
        case 3:
          {      
@@ -397,15 +447,7 @@ const SubmenuCube=()=>{
             setpolygonMarker([...polygonMarker,coordinateXY]);      
            }           
                 
-         break;}
-         case 4:
-             {                             
-              dispatch(setPointData([]));
-              setdataEdge([]);  
-              setdataPolygon([]); 
-              setdataBuild([]); 
-              dispatch(setAmenityDataG([])); 
-             break;}
+         break;}      
        default:
          {       
            break;}        
@@ -444,7 +486,7 @@ const SubmenuCube=()=>{
                 <div onClick={()=>selectionMarked===4?setselectionMarked(0):setselectionMarked(4)} className={`icons__footer color__marked ${selectionMarked===4?"color__marked-selected":""}`}><i class={`uil uil-trash-alt ${selectionMarked===4?"color__marked__icon-selected":""}`}></i></div>       
             </div>       
         </div>  
-        <div style={{zIndex:1000,cursor:"pointer",position:"absolute",backgroundColor:"#fff",top:300,left:10,boxShadow:"1px 1px 10px #b9b9b9",fontSize:"0.65rem",padding:"10px 5px"}}>
+        {maxNodeAmount? <div style={{zIndex:1000,cursor:"pointer",position:"absolute",backgroundColor:"#fff",top:300,left:10,boxShadow:"1px 1px 10px #b9b9b9",fontSize:"0.65rem",padding:"10px 5px"}}>
           <div style={{display:'flex',justifyContent:"space-around",fontWeight:"600",padding:"2px 0px"}}>
             <div className="color-bars">Global</div>                            
             <div className="color-bars">Local </div>  
@@ -473,7 +515,8 @@ const SubmenuCube=()=>{
                 <div className="color-bars" style={{"background-color":colorsrgba[0]}}></div>                                                                   
             </div>    
           </div>           
-        </div> 
+        </div> :null}
+       
         <div style={{zIndex:1000,cursor:"pointer",position:"absolute",backgroundColor:"#fff",top:10,left:120,border:"1px solid #5e5ef4",borderRadius:"10px",boxShadow:"1px 1px 10px #b9b9b9"}}>
               
             {selectionFilterPolygon&&selectPolygon.length?
