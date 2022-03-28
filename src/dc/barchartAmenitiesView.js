@@ -19,6 +19,7 @@ const AmenityFunc = (divRef, ndx,dispatch,dimPoly,dimNode) => {
     .slicesCap(4)
     .dimension(AmenityDimension)    
     .group(GrupAmenity)    
+    .ordinalColors(['#F94144', '#F3722C', '#F8961E', '#F9C74F', '#90BE6D','#43AA8B','#577590']) 
     .on('pretransition', function(chart) {
         chart.selectAll('text.pie-slice').text(function(d) {
             console.log(d)

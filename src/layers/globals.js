@@ -1,0 +1,2 @@
+export const COLOR_ICON_AMENITY=[[249, 65, 68,255],[243, 114, 44,255],[248, 150, 30,255],[249, 199, 79,255],[144, 190, 109,255],[67, 170, 139,255],[87, 117, 144,255]]
+export const AMENITY_CATEGORIES=["other","restaurant","fast_food","bicycle_parking","bar"]

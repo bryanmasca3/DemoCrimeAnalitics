@@ -14,7 +14,7 @@ import Swal from "sweetalert2";
 import axios from 'axios';
 import {useSelector} from 'react-redux';
 import {setAmenityDataG,setPointData,selectPointData,selectAmenityData,selectmaxPolygonAmount,selectmaxNodeAmount} from "./../redux/slice/Data";
-
+import {COLOR_ICON_AMENITY,AMENITY_CATEGORIES}from "./globals"
 
 
 const AppLayer=()=> {     
@@ -46,7 +46,7 @@ const AppLayer=()=> {
   const maxPolygonAmount = useSelector(selectmaxPolygonAmount);
   const maxNodeAmount = useSelector(selectmaxNodeAmount);
   
-
+  const valueP=50;
   let stateCircle=0;
   const [polygonMarker, setpolygonMarker] = useState([]);
 
@@ -68,21 +68,16 @@ const AppLayer=()=> {
 
   const [countAllCrimes, setcountAllCrimes] = useState(0);
   const ICON_MAPPING = {
-    marker: {x: 0, y: 0, width: 96, height: 96, mask: true}
+    restaurant: {x: 0, y: 0, width: 128, height: 128, mask: true},
+    fast_food: {x: 128, y: 0, width: 128, height: 128, mask: true},
+    bicycle_parking: {x: 256, y: 0, width: 128, height: 128, mask: true},
+    bar: {x: 384, y: 0, width: 128, height: 128, mask: true},
+    other: {x: 512, y: 0, width: 128, height: 128, mask: true},
   };
   const [selectPolygon, setselectPolygon] = useState([]);
 const colors=[[255,255,255,255],[251,255,210,255],[254,244,186,255],[255,238,164,255],[255,224,138,255],[252,218,123,255],[253,200,86,255],[251,120,74,255],[255,93,60,255],[255,63,63,255],[252,44,44,255]]
 const colorsrgba=["#f8f8f8","#fbffd2","#fef4ba","#ffeea4","#ffe08a","#fcda7b","#fdc856","#fb784a","#ff5d3c","#ff3f3f","#fc2c2c"]
-const AmenitiesIcon=[{              
-              type:"other",
-              url:"https://img.icons8.com/color/96/000000/error--v1.png"
-            },{              
-              type:"restaurant",
-              url:"https://img.icons8.com/color/96/000000/food.png"
-            },{              
-              type:"fast_food",
-              url:"https://img.icons8.com/color/96/000000/refreshments.png"
-            }];
+
 const transformCoordinates=(coordinates)=>{
 
   let arrayData=[]
@@ -169,8 +164,8 @@ const layers=[
     pickable: false,
     // iconAtlas and iconMapping are required
     // getIcon: return a string
-    //iconAtlas: 'https://img.icons8.com/color/96/000000/food.png',
-    iconAtlas: 'img/icons.png',
+    //iconAtlas: 'https://raw.githubusercontent.com/visgl/deck.gl-data/master/website/icon-atlas.png',
+    iconAtlas: 'https://raw.githubusercontent.com/bryanmasca3/DemoCrimeAnalitics/master/public/img/icons.png',
     /*iconAtlas: d=>{
       console.log(d)
       const idx=AmenitiesIcon.findIndex(item=>item.type===d.Amenity)!=-1     
@@ -182,12 +177,18 @@ const layers=[
       }
     },*/ 
     iconMapping: ICON_MAPPING,    
-    getIcon: d => 'marker',
-
+    getIcon: d => ICON_MAPPING[d.Amenity]?d.Amenity:'other',
     sizeScale: 5,
     getPosition: d => d.location.coordinates,
     getSize: d => 4,
-    getColor: d => [252, 140, 0]
+    getColor: d => {
+      const idx=AMENITY_CATEGORIES.findIndex(item=>item===d.Amenity)
+      if(idx!==-1){
+        return COLOR_ICON_AMENITY[idx]
+      }else{
+        return COLOR_ICON_AMENITY[idx+1]
+      }
+    }
   }):null,
     selectionFilterPolygon?new PolygonLayer({
       id: 'polygon-layer',
@@ -339,12 +340,12 @@ const SubmenuPoint=()=>{
       </div>      
     )
 }
-const LocalValue=()=>Array.from(Array(11).keys()).map((el)=>
+const LocalValue=()=>Array.from(Array(10).keys()).map((el)=>
   <div className="color-bars">{(el*(maxNodeAmount)/11).toFixed(2)} -</div>
 ).reverse()
 
-const GlobalValue=()=>Array.from(Array(11).keys()).map((el)=>
-  <div className="color-bars">{(el*(countAllCrimes)/11).toFixed(0)} -</div>
+const GlobalValue=()=>Array.from(Array(10).keys()).map((el)=>
+  <div className="color-bars">{(el*(countAllCrimes)/11).toFixed(2)} -</div>
 ).reverse()
 const handleResetSelectCube=()=>{
   try {
@@ -492,14 +493,21 @@ const handleRemoveAll=()=>{
             <div className="color-bars">Local </div>  
           </div>
           <div style={{display:'flex',gap:'0.2rem'}}>
-            <div style={{display:'flex',flexDirection:"column",justifyContent:"space-between"}}>                                            
-                {<GlobalValue/>}
+            <div style={{display:'flex',flexDirection:"column",justifyContent:"space-between"}}>   
+              <div className="color-bars">{`${countAllCrimes}.00`} -</div>                                         
+                {<GlobalValue/>}              
             </div>
-            <div style={{display:'flex',flexDirection:"column"}}>                
-                <div className="color-bars with" style={{"background-color":"#e5e5e5"}}></div>                                                                                                             
+            <div style={{display:'flex',flexDirection:"column",justifyContent:"flex-end"}}>                
+                <div  className="color-bars" 
+                style={{ height:`${(maxNodeAmount*100)/countAllCrimes}%`,backgroundImage: "linear-gradient(0deg, rgba(248,248,248,1) 0%, rgba(254,244,186,1) 19%, rgba(255,224,138,1) 37%, rgba(253,200,86,1) 57%, rgba(255,93,60,1) 80%, rgba(252,44,44,1) 100%)",
+                color: "darkred"}}
+                //style={{height:"100%",                
+                //backgroundColor:"linear-gradient(90deg, rgba(248,248,248,1) 0%, rgba(254,244,186,1) 19%, rgba(255,224,138,1) 37%, rgba(253,200,86,1) 57%, rgba(255,93,60,1) 80%, rgba(252,44,44,1) 100%)"}}
+                ></div>                                                                                                             
             </div>     
             <div style={{display:'flex',flexDirection:"column",justifyContent:"space-between"}}>   
-                {<LocalValue/>}         
+                <div className="color-bars">{`${maxNodeAmount}.00`} </div>
+                {<LocalValue/>}                           
             </div>
             <div style={{display:'flex',flexDirection:"column" ,justifyContent:"space-between"}}>                
                 <div className="color-bars" style={{"background-color":colorsrgba[10]}}></div>                            
