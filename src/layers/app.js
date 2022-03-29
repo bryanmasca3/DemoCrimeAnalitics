@@ -51,8 +51,8 @@ const AppLayer=()=> {
   const [polygonMarker, setpolygonMarker] = useState([]);
 
   const [viewState, setViewState] = useState({
-    longitude: /*-87.68393218513461-46.66708952168912*/-73.977857,
-    latitude: /*41.83339250270142-23.558393625659015*/40.731603,
+    longitude: -87.68393218513461/*-46.66708952168912/*-73.977857*/,
+    latitude: 41.83339250270142/*-23.558393625659015/*40.731603*/,
     zoom: /*10*/15,
     bearing: 0
   });
